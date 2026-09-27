@@ -70,23 +70,15 @@ After successful installation, it will be possible to access both front end (htt
 
 **NOTE**: Don't forget to change database credentials in docker-compose.yaml and in .env.backend by configuring `DATABASE_PASSWORD`.
 
-### Production: nginx + HTTPS (Let's Encrypt)
+### Production: domain + HTTPS
 
-`docker-compose.yaml` includes an `nginx` reverse proxy (port 80/443, routes `/` to the frontend and `/api`, `/admin`, `/static` to the backend) and a `certbot` service that renews certificates automatically every 12h.
+The production server runs [Coolify](https://coolify.io), which already manages its own Traefik reverse proxy on ports 80/443. Don't run a second proxy (e.g. nginx) bound to those ports — it will fail with "port is already allocated".
 
-Point your domain's DNS A record at the server first. Then, on first deploy only, issue the certificate (nginx can't serve HTTPS until the cert exists):
+Instead, configure the domain in the Coolify dashboard for this app:
 
-```bash
-# 1. Comment out the "listen 443 ..." server block in nginx/conf.d/app.conf, keep only the :80 block
-docker compose up -d nginx
-docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
-  -d joiyapropertychannel.com -d www.joiyapropertychannel.com \
-  --email subsformoiz@gmail.com --agree-tos --no-eff-email
-# 2. Uncomment the :443 block back in nginx/conf.d/app.conf
-docker compose up -d --build nginx certbot
-```
-
-After that, `docker compose up` alone is enough — certbot keeps the certificate renewed in the background.
+1. Point `joiyapropertychannel.com` (and `www`) DNS A records at the server's IP.
+2. In Coolify, open this application/service and add `joiyapropertychannel.com` as its domain, proxying to the `web` container's port `3000`. Add a separate domain/subdomain for the `api` container's port `8001` if the backend needs to be reachable directly (e.g. `api.joiyapropertychannel.com`).
+3. Coolify's Traefik issues and renews the Let's Encrypt certificate automatically — no manual certbot steps needed.
 
 ## Included dependencies
 
