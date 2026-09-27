@@ -38,9 +38,29 @@ services:
       - ./frontend:/app
     expose:
       - "3000"
-    ports:
-      - "3000:3000"
     env_file:
       - .env.frontend
     depends_on:
       - api
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    depends_on:
+      - api
+      - web
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: sh -c "trap exit TERM; while :; do certbot renew; sleep 12h; done"
+
+volumes:
+  certbot-etc:
+  certbot-www:

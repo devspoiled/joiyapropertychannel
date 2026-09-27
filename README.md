@@ -70,6 +70,24 @@ After successful installation, it will be possible to access both front end (htt
 
 **NOTE**: Don't forget to change database credentials in docker-compose.yaml and in .env.backend by configuring `DATABASE_PASSWORD`.
 
+### Production: nginx + HTTPS (Let's Encrypt)
+
+`docker-compose.yaml` includes an `nginx` reverse proxy (port 80/443, routes `/` to the frontend and `/api`, `/admin`, `/static` to the backend) and a `certbot` service that renews certificates automatically every 12h.
+
+Point your domain's DNS A record at the server first. Then, on first deploy only, issue the certificate (nginx can't serve HTTPS until the cert exists):
+
+```bash
+# 1. Comment out the "listen 443 ..." server block in nginx/conf.d/app.conf, keep only the :80 block
+docker compose up -d nginx
+docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
+  -d joiyapropertychannel.com -d www.joiyapropertychannel.com \
+  --email subsformoiz@gmail.com --agree-tos --no-eff-email
+# 2. Uncomment the :443 block back in nginx/conf.d/app.conf
+docker compose up -d --build nginx certbot
+```
+
+After that, `docker compose up` alone is enough — certbot keeps the certificate renewed in the background.
+
 ## Included dependencies
 
 The general rule when it comes to dependencies is to have minimum of third party applications or plugins to avoid future problems updating the project and keep the maintenance of applications is minimal.
