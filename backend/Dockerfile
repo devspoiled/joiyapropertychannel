@@ -11,4 +11,4 @@ RUN pip install uv && \
     uv venv && \
     uv sync
 
-EXPOSE 8000
+EXPOSE 8001

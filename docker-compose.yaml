@@ -16,13 +16,13 @@ services:
       timeout: 2s
       retries: 10
   api:
-    command: bash -c "uv sync && uv run -- python manage.py migrate && uv run -- python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "uv sync && uv run -- python manage.py migrate && uv run -- python manage.py runserver 0.0.0.0:8001"
     build:
       context: backend
     expose:
-      - "8000"
+      - "8001"
     ports:
-      - "8001:8000"
+      - "8001:8001"
     volumes:
       - ./backend:/app
     env_file:
