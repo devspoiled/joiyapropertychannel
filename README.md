@@ -66,7 +66,7 @@ On the backend it is possible to use third party libraries for loading environme
 docker compose up
 ```
 
-After successful installation, it will be possible to access both front end (http://localhost:3000) and backend (http://localhost:8000) part of the system from the browsers.
+After successful installation, it will be possible to access both front end (http://localhost:3000) and backend (http://localhost:8001) part of the system from the browsers.
 
 **NOTE**: Don't forget to change database credentials in docker-compose.yaml and in .env.backend by configuring `DATABASE_PASSWORD`.
 
@@ -238,7 +238,7 @@ docker compose exec web pnpm openapi:generate
 
 ### Swagger
 
-By default, Turbo includes Swagger for API schema which is available here `http://localhost:8000/api/schema/swagger-ui/`. Swagger can be disabled by editing `urls.py` and removing `SpectacularSwaggerView`.
+By default, Turbo includes Swagger for API schema which is available here `http://localhost:8001/api/schema/swagger-ui/`. Swagger can be disabled by editing `urls.py` and removing `SpectacularSwaggerView`.
 
 ### Client side requests
 
