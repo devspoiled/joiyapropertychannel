@@ -40,4 +40,4 @@ ignore = [
 
 [tool.pytest.ini_options]
 filterwarnings = "ignore"
-addopts = "--strict-config --strict-markers --ds=api.settings"
+addopts = "--strict-config --strict-markers --ds=apps.api.settings"

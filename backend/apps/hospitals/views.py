@@ -1,0 +1,41 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+
+from apps.api.geo import sort_by_distance
+
+from .models import Hospital
+from .serializers import HospitalSerializer
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "lat", float, description="Latitude to sort hospitals nearest-first from."
+            ),
+            OpenApiParameter(
+                "lng", float, description="Longitude to sort hospitals nearest-first from."
+            ),
+            OpenApiParameter(
+                "limit", int, description="Max number of hospitals to return (nearest first)."
+            ),
+        ]
+    )
+)
+class HospitalViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read-only hospitals list. Pass ?lat=&lng= to get distance_km from a
+    point and have results sorted nearest-first (used for a property's
+    "Nearby hospitals" section)."""
+
+    queryset = Hospital.objects.all()
+    serializer_class = HospitalSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        lat = self.request.query_params.get("lat")
+        lng = self.request.query_params.get("lng")
+        if lat is None or lng is None:
+            return queryset
+        return sort_by_distance(queryset, lat, lng, self.request.query_params.get("limit"))

@@ -1,0 +1,369 @@
+{% extends 'admin/base.html' %}
+{% load i18n %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}{% translate "Dashboard" %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  #jpc-dash{
+    --accent:#3b5bfd; --accent-soft:#eef1ff;
+    --green:#16a34a; --green-soft:#e8f8ee; --red:#dc2626; --red-soft:#fdecec;
+  }
+  .dark #jpc-dash, [data-theme="dark"] #jpc-dash{
+    --accent:#5b7fff; --accent-soft:#1c2747;
+    --green:#34d399; --green-soft:#123528; --red:#f87171; --red-soft:#3a1a1a;
+  }
+  #jpc-dash *{box-sizing:border-box;}
+  #jpc-dash{display:flex; flex-direction:column; gap:20px;}
+
+  #jpc-dash .page-head{display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:4px;}
+  #jpc-dash .page-title{font-size:26px; font-weight:700; margin:0;}
+  #jpc-dash .page-head-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+  #jpc-dash .pill{
+    display:flex; align-items:center; gap:8px; border:1px solid rgb(var(--color-base-200));
+    background:#ffffff; border-radius:10px; padding:9px 14px; font-size:13px; font-weight:500;
+  }
+  .dark #jpc-dash .pill, [data-theme="dark"] #jpc-dash .pill{
+    background:#161d2e; border-color:#28344c;
+  }
+  #jpc-dash .pill svg{width:15px; height:15px; opacity:.6;}
+  #jpc-dash .btn-primary{
+    background:var(--accent); color:#fff; border:0; border-radius:10px; padding:10px 18px;
+    font-size:13px; font-weight:600; cursor:pointer;
+  }
+
+  #jpc-dash .grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  #jpc-dash .grid-3{display:grid; grid-template-columns:2fr 1fr; gap:16px; align-items:start;}
+
+  #jpc-dash .card{
+    background:#ffffff; border:1px solid rgb(var(--color-base-200)); border-radius:16px; padding:20px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
+  }
+  .dark #jpc-dash .card, [data-theme="dark"] #jpc-dash .card{
+    background:#161d2e; border-color:#28344c; box-shadow:none;
+  }
+  #jpc-dash .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  #jpc-dash .card-title{font-size:14px; font-weight:600; margin:0;}
+  #jpc-dash .card-icon{
+    width:32px; height:32px; border-radius:9px; background:var(--accent-soft); color:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #jpc-dash .card-icon svg{width:16px; height:16px;}
+
+  #jpc-dash .stat-value{font-size:30px; font-weight:700; display:flex; align-items:center; gap:10px; margin:2px 0 8px;}
+  #jpc-dash .badge{font-size:12px; font-weight:600; border-radius:7px; padding:3px 7px; display:inline-flex; align-items:center; gap:2px;}
+  #jpc-dash .badge.up{background:var(--green-soft); color:var(--green);}
+  #jpc-dash .badge.down{background:var(--red-soft); color:var(--red);}
+  #jpc-dash .stat-sub{font-size:12px; opacity:.6;}
+
+  #jpc-dash .profit-value{font-size:36px; font-weight:700; margin:6px 0 6px;}
+  #jpc-dash .chart-row{display:flex; gap:24px; align-items:flex-end;}
+  #jpc-dash .chart-col{flex:1; min-width:0;}
+
+  #jpc-dash .breakdown-row{display:flex; gap:16px; margin-top:16px;}
+  #jpc-dash .breakdown-item{flex:1;}
+  #jpc-dash .breakdown-num{font-size:20px; font-weight:700; display:flex; align-items:center; gap:6px;}
+  #jpc-dash .breakdown-dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  #jpc-dash .breakdown-label{font-size:12px; opacity:.6; margin:2px 0 8px;}
+  #jpc-dash .breakdown-bar{height:6px; border-radius:4px; background:#eef0f3; overflow:hidden;}
+  .dark #jpc-dash .breakdown-bar, [data-theme="dark"] #jpc-dash .breakdown-bar{background:#1e2740;}
+  #jpc-dash .breakdown-bar > div{height:100%; border-radius:4px;}
+
+  #jpc-dash table{width:100%; border-collapse:collapse; font-size:13px;}
+  #jpc-dash thead th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.6;
+    font-weight:600; padding:0 8px 10px; border-bottom:1px solid rgb(var(--color-base-200));
+  }
+  #jpc-dash tbody td{padding:12px 8px; border-bottom:1px solid rgb(var(--color-base-200)); vertical-align:middle;}
+  #jpc-dash tbody tr:last-child td{border-bottom:0;}
+  #jpc-dash .prop-cell{display:flex; align-items:center; gap:10px;}
+  #jpc-dash .prop-thumb{
+    width:34px; height:34px; border-radius:8px; background:#f0f1f3; display:flex; align-items:center;
+    justify-content:center; color:#475569; flex-shrink:0;
+  }
+  .dark #jpc-dash .prop-thumb, [data-theme="dark"] #jpc-dash .prop-thumb{
+    background:#1e2740; color:#94a3b8;
+  }
+  #jpc-dash .prop-thumb svg{width:16px; height:16px;}
+  #jpc-dash .muted{opacity:.6;}
+  #jpc-dash .id-cell{opacity:.5; font-variant-numeric:tabular-nums;}
+
+  #jpc-dash .empty-state{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:36px 20px 28px; gap:4px;
+  }
+  #jpc-dash .empty-state-icon{
+    width:48px; height:48px; border-radius:12px; background:rgb(var(--color-base-100));
+    display:flex; align-items:center; justify-content:center; opacity:.5; margin-bottom:8px;
+  }
+  .dark #jpc-dash .empty-state-icon, [data-theme="dark"] #jpc-dash .empty-state-icon{background:#1e2740;}
+  #jpc-dash .empty-state-icon svg{width:24px; height:24px;}
+  #jpc-dash .empty-state-title{font-size:14px; font-weight:600; margin:0;}
+  #jpc-dash .empty-state-text{font-size:13px; opacity:.6; margin:0 0 16px;}
+  #jpc-dash .empty-state-btn{
+    background:var(--accent); color:#fff; border-radius:9px; padding:8px 16px;
+    font-size:13px; font-weight:600;
+  }
+
+  #jpc-dash .weekday-bars{display:flex; align-items:flex-end; gap:10px; height:150px; margin-top:10px;}
+  #jpc-dash .weekday-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px; height:100%;}
+  #jpc-dash .weekday-bar{width:100%; max-width:28px; border-radius:6px 6px 3px 3px; background:#eef0f3;}
+  .dark #jpc-dash .weekday-bar, [data-theme="dark"] #jpc-dash .weekday-bar{background:#1e2740;}
+  #jpc-dash .weekday-bar.peak{background:var(--accent);}
+  #jpc-dash .weekday-name{font-size:12px; opacity:.6;}
+  #jpc-dash .weekday-name.peak{color:var(--accent); font-weight:700; opacity:1;}
+  #jpc-dash .peak-value{font-size:13px; font-weight:700; text-align:center; margin-bottom:2px;}
+
+  #jpc-dash .gauge-wrap{display:flex; flex-direction:column; align-items:center; padding:8px 0 4px;}
+  #jpc-dash .gauge-pct{font-size:30px; font-weight:700; margin-top:-58px;}
+  #jpc-dash .gauge-caption{font-size:12px; opacity:.6; margin-top:2px;}
+  #jpc-dash .gauge-btn{
+    margin-top:16px; border:1px solid rgb(var(--color-base-200)); background:transparent;
+    font-size:13px; font-weight:600; border-radius:9px; padding:9px 16px; cursor:pointer; width:100%; color:inherit;
+  }
+
+  @media (max-width:1100px){
+    #jpc-dash .grid-4{grid-template-columns:repeat(2,1fr);}
+    #jpc-dash .grid-3{grid-template-columns:1fr;}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="jpc-dash">
+  <div class="page-head">
+    <h1 class="page-title">{% translate "Dashboard" %}</h1>
+    <div class="page-head-right">
+      <div class="pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        {% translate "Last 30 days" %}
+      </div>
+      <button class="btn-primary" type="button" onclick="window.print()">{% translate "Export" %}</button>
+    </div>
+  </div>
+
+  {# Stat cards #}
+  <div class="grid-4">
+    {% for stat in stat_cards %}
+    <div class="card">
+      <div class="card-head">
+        <p class="card-title">{{ stat.label }}</p>
+        <div class="card-icon">
+          {% if stat.icon == "home" %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          {% elif stat.icon == "users" %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5"/><circle cx="18" cy="8" r="2.5"/><path d="M16 14.2c2.7.4 4.5 2.1 4.5 5.8"/></svg>
+          {% elif stat.icon == "badge" %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="M8 14 6 22l6-3 6 3-2-8"/></svg>
+          {% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+          {% endif %}
+        </div>
+      </div>
+      <div class="stat-value">
+        {{ stat.value }}
+        {% if stat.delta >= 0 %}
+          <span class="badge up">▲ {{ stat.delta }}%</span>
+        {% else %}
+          <span class="badge down">▼ {{ stat.delta }}%</span>
+        {% endif %}
+      </div>
+      <div class="stat-sub">{% translate "vs." %} {{ stat.prev }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Portfolio chart + breakdown | side widgets #}
+  <div class="grid-3">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <div class="card">
+        <div class="card-head">
+          <p class="card-title">{% translate "Avg. Listing Value" %}</p>
+        </div>
+        <div class="chart-row">
+          <div>
+            <div class="profit-value">Rs {{ total_value_lac }} Lac</div>
+            <span class="badge up">▲ {% translate "trend" %}</span>
+            <span class="stat-sub" style="margin-left:6px;">{% translate "vs. last period" %}</span>
+          </div>
+          <div class="chart-col">
+            <svg id="area-chart" viewBox="0 0 600 180" width="100%" height="150" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+
+        <div class="breakdown-row">
+          {% for t in type_breakdown %}
+          <div class="breakdown-item">
+            <div class="breakdown-num">
+              <span class="breakdown-dot" style="background:{{ t.color }};"></span>
+              {{ t.value }}
+            </div>
+            <div class="breakdown-label">{{ t.label }}</div>
+            <div class="breakdown-bar"><div style="width:{{ t.pct }}%; background:{{ t.color }};"></div></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <p class="card-title">{% translate "Latest Properties" %}</p>
+        </div>
+        {% if latest_properties %}
+        <table>
+          <thead>
+            <tr><th>ID</th><th>{% translate "Address" %}</th><th>{% translate "Type" %}</th><th>{% translate "Price" %}</th><th>{% translate "Status" %}</th></tr>
+          </thead>
+          <tbody>
+            {% for p in latest_properties %}
+            <tr>
+              <td class="id-cell">#{{ p.id|stringformat:"s"|slice:":8" }}</td>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+                  </div>
+                  {{ p.address|truncatechars:28 }}
+                </div>
+              </td>
+              <td class="muted">{{ p.get_type_display }}</td>
+              <td>Rs {{ p.price_lac }} Lac</td>
+              <td class="muted">{{ p.get_status_display }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          </div>
+          <p class="empty-state-title">{% translate "No properties yet" %}</p>
+          <p class="empty-state-text">{% translate "Listings you add will show up here." %}</p>
+          <a class="empty-state-btn" href="{% url 'admin:properties_property_add' %}">{% translate "Add Property" %}</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card">
+        <div class="card-head">
+          <p class="card-title">{% translate "Listings This Week" %}</p>
+        </div>
+        <div class="peak-value">{{ weekday_max }}</div>
+        <div class="weekday-bars">
+          {% for day in weekdays %}
+          <div class="weekday-col">
+            <div class="weekday-bar {% if day.is_peak %}peak{% endif %}" style="height:{{ day.pct }}%;"></div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="weekday-bars" style="height:auto; margin-top:2px;">
+          {% for day in weekdays %}
+          <div class="weekday-col" style="height:auto;">
+            <span class="weekday-name {% if day.is_peak %}peak{% endif %}">{{ day.name }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <p class="card-title">{% translate "Verified Agent Rate" %}</p>
+        </div>
+        <div class="gauge-wrap">
+          <svg id="gauge" viewBox="0 0 200 110" width="200" height="110"></svg>
+          <div class="gauge-pct">{{ verified_rate }}%</div>
+          <div class="gauge-caption">{{ verified_agents }} {% translate "of" %} {{ total_agents }} {% translate "agents verified" %}</div>
+          <button class="gauge-btn" type="button" onclick="location.href='{% url 'admin:agents_agent_changelist' %}'">{% translate "Show details" %}</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><p class="card-title">{% translate "Coverage" %}</p></div>
+        <div class="breakdown-row" style="margin-top:0;">
+          <div class="breakdown-item">
+            <div class="breakdown-num">{{ neighborhood_count }}</div>
+            <div class="breakdown-label">{% translate "Neighborhoods" %}</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-num">{{ school_count }}</div>
+            <div class="breakdown-label">{% translate "Schools" %}</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-num">{{ hospital_count }}</div>
+            <div class="breakdown-label">{% translate "Hospitals" %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var chartLabels = {{ chart_labels|safe }};
+  var chartValues = {{ chart_values|safe }};
+  var verifiedRate = {{ verified_rate }};
+
+  function isDark(){
+    return document.documentElement.getAttribute('data-theme') === 'dark' ||
+      (!document.documentElement.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  function drawArea(){
+    var svg = document.getElementById('area-chart');
+    if (!svg) return;
+    var w = 600, h = 180, pad = 10;
+    var max = Math.max.apply(null, chartValues.concat([1])) * 1.15;
+    var stepX = (w - pad*2) / (chartValues.length - 1 || 1);
+    var accent = '#3b5bfd';
+    var points = chartValues.map(function(v, i){
+      var x = pad + i*stepX;
+      var y = h - pad - (v/max)*(h - pad*2);
+      return [x, y];
+    });
+    var linePath = points.map(function(p,i){ return (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+    var areaPath = linePath + ' L ' + points[points.length-1][0].toFixed(1) + ',' + (h-pad) + ' L ' + points[0][0].toFixed(1) + ',' + (h-pad) + ' Z';
+    svg.innerHTML =
+      '<defs><linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + accent + '" stop-opacity="0.35"/>' +
+      '<stop offset="100%" stop-color="' + accent + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + areaPath + '" fill="url(#areaFill)" stroke="none"/>' +
+      '<path d="' + linePath + '" fill="none" stroke="' + accent + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
+
+  function drawGauge(){
+    var svg = document.getElementById('gauge');
+    if (!svg) return;
+    var cx = 100, cy = 100, r = 80;
+    var segments = 28;
+    var pct = Math.max(0, Math.min(100, verifiedRate));
+    var filled = Math.round(segments * pct / 100);
+    var green = '#16a34a';
+    var border = isDark() ? '#28344c' : '#e5e5e5';
+    var bars = '';
+    for (var i = 0; i < segments; i++){
+      var angle = Math.PI - (i/(segments-1))*Math.PI;
+      var x1 = cx + (r-14)*Math.cos(angle), y1 = cy - (r-14)*Math.sin(angle);
+      var x2 = cx + r*Math.cos(angle), y2 = cy - r*Math.sin(angle);
+      var color = i < filled ? green : border;
+      bars += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+color+'" stroke-width="5" stroke-linecap="round"/>';
+    }
+    svg.innerHTML = bars;
+  }
+
+  function drawCharts(){ drawArea(); drawGauge(); }
+  drawCharts();
+  window.addEventListener('resize', drawCharts);
+
+  // Redraw when Unfold's theme toggle flips data-theme (gauge track color depends on it).
+  new MutationObserver(drawCharts).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+})();
+</script>
+{% endblock %}
