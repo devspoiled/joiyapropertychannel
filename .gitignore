@@ -4,6 +4,7 @@ node_modules
 .idea
 requirements.txt
 TODO.md
+.env
 .env.backend
 .env.frontend
 data
