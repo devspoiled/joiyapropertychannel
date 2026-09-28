@@ -1,44 +1,43 @@
 services:
   db:
     image: postgres:17-bookworm
-    expose:
-      - "5432"
-    ports:
-      - "5432:5432"
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: "change-password"
-      POSTGRES_DB: "db"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db"]
       interval: 2s
       timeout: 2s
       retries: 10
+    restart: unless-stopped
+
   api:
-    command: bash -c "uv sync && uv run -- python manage.py migrate && uv run -- python manage.py runserver 0.0.0.0:8001"
     build:
       context: backend
+      dockerfile: Dockerfile.prod
     expose:
       - "8001"
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./backend:/app
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
   web:
-    command: bash -c "pnpm install -r && pnpm --filter web dev"
     build:
       context: frontend
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "3000:3000"
+      dockerfile: Dockerfile.prod
+    expose:
+      - "3000"
     env_file:
       - .env
     depends_on:
       - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
