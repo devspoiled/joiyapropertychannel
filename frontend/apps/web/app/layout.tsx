@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/providers/auth-provider'
+import { AuthModalProvider } from '@/providers/auth-modal-provider'
 import type { Metadata } from 'next'
 
 import '@frontend/ui/styles/globals.css'
@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthModalProvider>{children}</AuthModalProvider>
       </body>
     </html>
   )

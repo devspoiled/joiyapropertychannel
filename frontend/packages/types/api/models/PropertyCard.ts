@@ -30,5 +30,6 @@ export type PropertyCard = {
     cover_image_url?: string;
     image_count?: number;
     readonly image_urls: Array<string>;
+    readonly is_saved: boolean;
 };
 

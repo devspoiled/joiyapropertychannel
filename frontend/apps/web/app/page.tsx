@@ -18,9 +18,10 @@ const mono = IBM_Plex_Mono({
 
 export default async function Home() {
   const apiClient = await getApiClient()
-  const [propertiesPage, neighborhoodsPage] = await Promise.all([
+  const [propertiesPage, neighborhoodsPage, agentsPage] = await Promise.all([
     apiClient.properties.propertiesList(),
-    apiClient.neighborhoods.neighborhoodsList()
+    apiClient.neighborhoods.neighborhoodsList(),
+    apiClient.agents.agentsList()
   ])
 
   return (
@@ -36,6 +37,7 @@ export default async function Home() {
       <HomePage
         properties={propertiesPage.results ?? []}
         neighborhoods={neighborhoodsPage.results ?? []}
+        agents={agentsPage.results ?? []}
       />
     </div>
   )

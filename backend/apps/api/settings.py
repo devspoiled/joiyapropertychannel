@@ -25,6 +25,37 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+# Shared secret the frontend's auth server sends when bridging a verified
+# social login (e.g. Google) into a Django JWT — proves the call comes from
+# our own server, not a browser. See apps.users.views.SocialLoginView.
+INTERNAL_AUTH_SECRET = environ.get("INTERNAL_AUTH_SECRET", "")
+
+######################################################################
+# Cloudinary (image hosting for seeded/demo listing photos)
+######################################################################
+CLOUDINARY_CLOUD_NAME = environ.get("CLOUDINARY_CLOUD_NAME", "")
+CLOUDINARY_API_KEY = environ.get("CLOUDINARY_API_KEY", "")
+CLOUDINARY_API_SECRET = environ.get("CLOUDINARY_API_SECRET", "")
+
+######################################################################
+# Contact form (Resend)
+######################################################################
+RESEND_API_KEY = environ.get("RESEND_API_KEY", "")
+CONTACT_EMAIL_FROM = environ.get("CONTACT_EMAIL_FROM", "onboarding@resend.dev")
+# Fixed destination for every contact form submission — not configurable
+# per-request, this is where site inquiries always go.
+CONTACT_EMAIL_TO = "M.asifkhan3030143@gmail.com"
+
+if CLOUDINARY_CLOUD_NAME:
+    import cloudinary
+
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
+
 WSGI_APPLICATION = "apps.api.wsgi.application"
 
 ROOT_URLCONF = "apps.api.urls"
@@ -248,6 +279,11 @@ UNFOLD = {
                         "title": _("Properties"),
                         "icon": "home_work",
                         "link": reverse_lazy("admin:properties_property_changelist"),
+                    },
+                    {
+                        "title": _("Saved Properties"),
+                        "icon": "favorite",
+                        "link": reverse_lazy("admin:properties_savedproperty_changelist"),
                     },
                     {
                         "title": _("Price History"),

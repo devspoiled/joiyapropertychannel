@@ -11,6 +11,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { Agent } from './models/Agent';
+export type { Contact } from './models/Contact';
 export { EventEnum } from './models/EventEnum';
 export type { Hospital } from './models/Hospital';
 export type { Neighborhood } from './models/Neighborhood';
@@ -30,6 +31,8 @@ export type { PropertyImage } from './models/PropertyImage';
 export type { PropertyWrite } from './models/PropertyWrite';
 export type { School } from './models/School';
 export { SchoolTypeEnum } from './models/SchoolTypeEnum';
+export type { SocialLogin } from './models/SocialLogin';
+export type { SocialLoginResponse } from './models/SocialLoginResponse';
 export { StatusEnum } from './models/StatusEnum';
 export type { TaxHistory } from './models/TaxHistory';
 export type { TokenObtainPair } from './models/TokenObtainPair';
@@ -43,6 +46,8 @@ export type { UserCurrent } from './models/UserCurrent';
 export type { UserCurrentError } from './models/UserCurrentError';
 
 export { AgentsService } from './services/AgentsService';
+export { AuthService } from './services/AuthService';
+export { ContactService } from './services/ContactService';
 export { HospitalsService } from './services/HospitalsService';
 export { NeighborhoodsService } from './services/NeighborhoodsService';
 export { PriceHistoryService } from './services/PriceHistoryService';

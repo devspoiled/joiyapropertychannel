@@ -1,10 +1,12 @@
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
-from .models import Property
+from .models import Property, SavedProperty
 from .serializers import PropertyCardSerializer, PropertySerializer, PropertyWriteSerializer
 
 
@@ -19,11 +21,14 @@ class PropertyPagination(PageNumberPagination):
         parameters=[
             OpenApiParameter("type", str, description="Filter by property type"),
             OpenApiParameter("city", str, description="Filter by neighborhood city"),
-            OpenApiParameter("neighborhood", str, description="Filter by neighborhood id"),
+            OpenApiParameter("neighborhood", str, description="Filter by neighborhood slug"),
             OpenApiParameter("price_max", int, description="Max price in Lac"),
             OpenApiParameter("beds", int, description="Minimum bedrooms"),
             OpenApiParameter(
                 "q", str, description="Search by address, neighborhood or city"
+            ),
+            OpenApiParameter(
+                "saved", bool, description="Only the current user's saved properties"
             ),
         ]
     )
@@ -37,7 +42,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     pagination_class = PropertyPagination
 
     def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
+        if self.action in ("create", "update", "partial_update", "destroy", "save", "unsave"):
             return [IsAuthenticated()]
         return super().get_permissions()
 
@@ -58,7 +63,20 @@ class PropertyViewSet(viewsets.ModelViewSet):
         elif self.action == "list":
             queryset = queryset.prefetch_related("images")
 
+        if self.request.user.is_authenticated:
+            queryset = queryset.annotate(
+                is_saved=Exists(
+                    SavedProperty.objects.filter(
+                        property=OuterRef("pk"), user=self.request.user
+                    )
+                )
+            )
+
         params = self.request.query_params
+
+        saved = params.get("saved")
+        if saved and self.request.user.is_authenticated:
+            queryset = queryset.filter(saves__user=self.request.user)
 
         type_ = params.get("type")
         if type_:
@@ -70,7 +88,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         neighborhood = params.get("neighborhood")
         if neighborhood:
-            queryset = queryset.filter(neighborhood_id=neighborhood)
+            queryset = queryset.filter(neighborhood__slug=neighborhood)
 
         price_max = params.get("price_max")
         if price_max:
@@ -93,3 +111,15 @@ class PropertyViewSet(viewsets.ModelViewSet):
     @extend_schema(responses={200: PropertySerializer})
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+
+    @extend_schema(request=None, responses={204: None})
+    @action(detail=True, methods=["post"])
+    def save(self, request, *args, **kwargs):
+        SavedProperty.objects.get_or_create(property=self.get_object(), user=request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(request=None, responses={204: None})
+    @action(detail=True, methods=["post"])
+    def unsave(self, request, *args, **kwargs):
+        SavedProperty.objects.filter(property=self.get_object(), user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

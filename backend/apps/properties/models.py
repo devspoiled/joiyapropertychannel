@@ -31,15 +31,6 @@ class Property(UUIDModel):
         related_name="properties",
         verbose_name=_("neighborhood"),
     )
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        related_name="saved_properties",
-        verbose_name=_("saved by"),
-        null=True,
-        blank=True,
-        help_text=_("Customer this listing is saved/favourited by, if any."),
-    )
 
     type = models.CharField(
         _("property type"), max_length=20, choices=PropertyType.choices
@@ -108,3 +99,35 @@ class PropertyImage(models.Model):
 
     def __str__(self):
         return f"{self.property.address} — photo {self.order + 1}"
+
+
+class SavedProperty(models.Model):
+    """Join table for a customer favouriting/saving a listing — a property
+    can be saved by many customers, and a customer can save many properties."""
+
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name="saves",
+        verbose_name=_("property"),
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="saved_properties",
+        verbose_name=_("user"),
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        db_table = "saved_properties"
+        verbose_name = _("saved property")
+        verbose_name_plural = _("saved properties")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["property", "user"], name="unique_saved_property_per_user"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} saved {self.property.address}"

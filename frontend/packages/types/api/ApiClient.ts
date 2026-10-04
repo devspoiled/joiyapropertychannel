@@ -6,6 +6,8 @@ import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
 import { AgentsService } from './services/AgentsService';
+import { AuthService } from './services/AuthService';
+import { ContactService } from './services/ContactService';
 import { HospitalsService } from './services/HospitalsService';
 import { NeighborhoodsService } from './services/NeighborhoodsService';
 import { PriceHistoryService } from './services/PriceHistoryService';
@@ -18,6 +20,8 @@ import { UsersService } from './services/UsersService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class ApiClient {
     public readonly agents: AgentsService;
+    public readonly auth: AuthService;
+    public readonly contact: ContactService;
     public readonly hospitals: HospitalsService;
     public readonly neighborhoods: NeighborhoodsService;
     public readonly priceHistory: PriceHistoryService;
@@ -41,6 +45,8 @@ export class ApiClient {
             ENCODE_PATH: config?.ENCODE_PATH,
         });
         this.agents = new AgentsService(this.request);
+        this.auth = new AuthService(this.request);
+        this.contact = new ContactService(this.request);
         this.hospitals = new HospitalsService(this.request);
         this.neighborhoods = new NeighborhoodsService(this.request);
         this.priceHistory = new PriceHistoryService(this.request);

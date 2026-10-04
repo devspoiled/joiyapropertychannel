@@ -32,5 +32,6 @@ export type Property = {
     readonly tax_history: Array<TaxHistory>;
     readonly price_history: Array<PriceHistory>;
     readonly created_at: string;
+    readonly is_saved: boolean;
 };
 

@@ -25,16 +25,17 @@ export default async function ListingsPage({
     city?: string
     price_max?: string
     beds?: string
+    neighborhood?: string
   }>
 }) {
-  const { page, type, city, price_max, beds } = await searchParams
+  const { page, type, city, price_max, beds, neighborhood } = await searchParams
   const pageNumber = Math.max(1, Number(page) || 1)
 
   const apiClient = await getApiClient()
   const propertiesPage = await apiClient.properties.propertiesList(
     beds ? Number(beds) : undefined,
     city || undefined,
-    undefined,
+    neighborhood || undefined,
     pageNumber,
     PAGE_SIZE,
     price_max ? Number(price_max) : undefined,

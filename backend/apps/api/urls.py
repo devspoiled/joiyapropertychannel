@@ -4,6 +4,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.api.dashboard import dashboard_view
+from apps.api.views import ContactView
 
 urlpatterns = [
     path("admin/dashboard/", dashboard_view, name="dashboard"),
@@ -12,6 +13,7 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
     ),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/contact/", ContactView.as_view(), name="contact"),
     path("api/", include("apps.users.urls")),
     path("api/", include("apps.agents.urls")),
     path("api/", include("apps.neighborhoods.urls")),

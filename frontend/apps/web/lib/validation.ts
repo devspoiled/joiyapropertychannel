@@ -1,15 +1,16 @@
 import { z } from 'zod'
 
 const loginFormSchema = z.object({
-  username: z.string().min(6),
+  email: z.string().email(),
   password: z.string().min(8)
 })
 
 const registerFormSchema = z
   .object({
-    username: z.string().min(6),
-    password: z.string().min(6),
-    passwordRetype: z.string().min(6)
+    name: z.string().min(2),
+    email: z.string().email(),
+    password: z.string().min(8),
+    passwordRetype: z.string().min(8)
   })
   .refine((data) => data.password === data.passwordRetype, {
     message: 'Passwords are not matching',

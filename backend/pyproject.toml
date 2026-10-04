@@ -10,6 +10,8 @@ dependencies = [
     "drf-spectacular>=0.28",
     "django-unfold>=0.43.0",
     "gunicorn>=26.2.0",
+    "cloudinary>=1.46.2",
+    "pillow>=12.3.0",
 ]
 
 [dependency-groups]

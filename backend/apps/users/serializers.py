@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 
@@ -89,7 +88,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "password", "password_retype"]
+        fields = ["username", "email", "password", "password_retype"]
+        extra_kwargs = {"email": {"required": True}}
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise exceptions.ValidationError(_("An account with this email already exists."))
+        return value
 
     def validate(self, attrs):
         password_retype = attrs.pop("password_retype")
@@ -105,18 +110,24 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return self.fail("password_mismatch")
 
     def create(self, validated_data):
-        with transaction.atomic():
-            user = User.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data)
 
-            # By default newly registered accounts are inactive.
-            user.is_active = False
-            user.save(update_fields=["is_active"])
 
-        return user
+class SocialLoginSerializer(serializers.Serializer):
+    secret = serializers.CharField(write_only=True)
+    email = serializers.EmailField()
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+
+
+class SocialLoginResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
 
 
 class UserCreateErrorSerializer(serializers.Serializer):
     username = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    email = serializers.ListSerializer(child=serializers.CharField(), required=False)
     password = serializers.ListSerializer(child=serializers.CharField(), required=False)
     password_retype = serializers.ListSerializer(
         child=serializers.CharField(), required=False

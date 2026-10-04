@@ -13,11 +13,12 @@ export class PropertiesService {
     /**
      * @param beds Minimum bedrooms
      * @param city Filter by neighborhood city
-     * @param neighborhood Filter by neighborhood id
+     * @param neighborhood Filter by neighborhood slug
      * @param page A page number within the paginated result set.
      * @param pageSize Number of results to return per page.
      * @param priceMax Max price in Lac
      * @param q Search by address, neighborhood or city
+     * @param saved Only the current user's saved properties
      * @param type Filter by property type
      * @returns PaginatedPropertyCardList
      * @throws ApiError
@@ -30,6 +31,7 @@ export class PropertiesService {
         pageSize?: number,
         priceMax?: number,
         q?: string,
+        saved?: boolean,
         type?: string,
     ): CancelablePromise<PaginatedPropertyCardList> {
         return this.httpRequest.request({
@@ -43,6 +45,7 @@ export class PropertiesService {
                 'page_size': pageSize,
                 'price_max': priceMax,
                 'q': q,
+                'saved': saved,
                 'type': type,
             },
         });
@@ -129,6 +132,38 @@ export class PropertiesService {
         return this.httpRequest.request({
             method: 'DELETE',
             url: '/api/properties/{id}/',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
+     * @param id A UUID string identifying this property.
+     * @returns void
+     * @throws ApiError
+     */
+    public propertiesSaveCreate(
+        id: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/properties/{id}/save/',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
+     * @param id A UUID string identifying this property.
+     * @returns void
+     * @throws ApiError
+     */
+    public propertiesUnsaveCreate(
+        id: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/properties/{id}/unsave/',
             path: {
                 'id': id,
             },

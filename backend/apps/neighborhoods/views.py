@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 
@@ -6,7 +7,9 @@ from .serializers import NeighborhoodSerializer
 
 
 class NeighborhoodViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Neighborhood.objects.all()
+    queryset = Neighborhood.objects.annotate(
+        listing_count=Count("properties", filter=Q(properties__is_active=True), distinct=True)
+    )
     serializer_class = NeighborhoodSerializer
     permission_classes = [AllowAny]
 

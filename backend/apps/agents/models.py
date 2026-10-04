@@ -13,9 +13,19 @@ class Agent(UUIDModel):
         verbose_name=_("user"),
     )
     brokerage = models.CharField(_("brokerage"), max_length=150, blank=True)
+    designation = models.CharField(_("designation"), max_length=100, blank=True)
     phone = models.CharField(_("phone"), max_length=30, blank=True)
+    photo_url = models.URLField(_("photo URL"), blank=True)
     bio = models.TextField(_("bio"), blank=True)
+    experience_highlights = models.TextField(
+        _("experience highlights"), blank=True, help_text=_("One bullet per line.")
+    )
     is_verified = models.BooleanField(_("verified"), default=False)
+    is_founder = models.BooleanField(
+        _("founder"),
+        default=False,
+        help_text=_("Featured as Founder & Owner instead of in the regular agent grid."),
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     modified_at = models.DateTimeField(_("modified at"), auto_now=True)
 

@@ -25,6 +25,7 @@ class PropertyCardSerializer(serializers.ModelSerializer):
     agent = AgentSerializer(read_only=True)
     neighborhood = NeighborhoodSerializer(read_only=True)
     image_urls = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
@@ -45,11 +46,16 @@ class PropertyCardSerializer(serializers.ModelSerializer):
             "cover_image_url",
             "image_count",
             "image_urls",
+            "is_saved",
         ]
 
     @extend_schema_field(serializers.ListField(child=serializers.CharField()))
     def get_image_urls(self, obj):
         return [img.url for img in obj.images.all()[:8]]
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_is_saved(self, obj):
+        return bool(getattr(obj, "is_saved", False))
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -58,6 +64,7 @@ class PropertySerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True, read_only=True)
     tax_history = TaxHistorySerializer(many=True, read_only=True)
     price_history = PriceHistorySerializer(many=True, read_only=True)
+    is_saved = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
@@ -84,7 +91,15 @@ class PropertySerializer(serializers.ModelSerializer):
             "tax_history",
             "price_history",
             "created_at",
+            "is_saved",
         ]
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_is_saved(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return obj.saves.filter(user=user).exists()
 
 
 class PropertyWriteSerializer(serializers.ModelSerializer):

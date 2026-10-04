@@ -10,5 +10,6 @@ export type Neighborhood = {
     description?: string;
     median_price_lac?: number | null;
     cover_image_url?: string;
+    readonly listing_count: number;
 };
 

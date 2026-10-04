@@ -12,6 +12,7 @@ from apps.price_history.models import PriceHistory
 from apps.properties.models import Property, PropertyImage
 from apps.schools.models import School
 from apps.tax_history.models import TaxHistory
+from seeding import cloudinary_images
 
 User = get_user_model()
 
@@ -44,49 +45,101 @@ HOSPITALS = [
 
 
 NEIGHBORHOODS = [
-    # name, city, median_price_lac, photo_id, center_lat, center_lng
-    ("DHA Phase 6", "Lahore", 640, "photo-1600585154340-be6161a56a0c", 31.4697, 74.4142),
-    ("DHA Phase 9", "Lahore", 190, "photo-1494526585095-c41746248156", 31.4432, 74.3805),
-    ("Gulberg III", "Lahore", 310, "photo-1449824913935-59a10b8d2000", 31.5099, 74.3466),
-    ("Bahria Town", "Lahore", 85, "photo-1570129477492-45c003edd2be", 31.3688, 74.1817),
-    ("Model Town", "Lahore", 420, "photo-1512917774080-9991f1c4c750", 31.4805, 74.3235),
+    # name, city, median_price_lac, photo_entry, center_lat, center_lng, forced_type
+    # forced_type pins every property in that scheme to one listing type, so
+    # the address format below (plot/house numbering) always matches what's
+    # actually being sold there — these three are plot/house societies, not
+    # mixed-use neighborhoods. photo_entry is resolved through resolve_photo()
+    # below — either a raw Unsplash photo id or a PLOT_COMPOSITES label.
+    ("DHA Phase 6", "Lahore", 640, "photo-1600585154340-be6161a56a0c", 31.4697, 74.4142, None),
+    ("DHA Phase 9", "Lahore", 190, "photo-1494526585095-c41746248156", 31.4432, 74.3805, None),
+    ("Gulberg III", "Lahore", 310, "photo-1449824913935-59a10b8d2000", 31.5099, 74.3466, None),
+    ("Bahria Town", "Lahore", 85, "photo-1570129477492-45c003edd2be", 31.3688, 74.1817, None),
+    ("Model Town", "Lahore", 420, "photo-1512917774080-9991f1c4c750", 31.4805, 74.3235, None),
+    ("Safari Garden", "Lahore", 55, "plot-field-road-1", 31.3587, 74.2008, Property.PropertyType.PLOT),
+    ("Bahria EMC", "Lahore", 75, "plot-bare-dirt-1", 31.3652, 74.1774, Property.PropertyType.PLOT),
+    ("Central Park Housing Scheme", "Lahore", 230, "photo-1691749457417-74193b07ca1b", 31.3989, 74.2296, Property.PropertyType.HOUSE),
 ]
 
+# Societies with their own plot/house numbering + block, instead of the
+# generic "Street 12, <neighborhood>" format used elsewhere.
+PLOT_SCHEME_BLOCKS = {
+    "Safari Garden": "C Block",
+    "Bahria EMC": "Block B",
+}
+HOUSE_SCHEME_BLOCKS = {
+    "Central Park Housing Scheme": "Block D",
+}
+MARLA_SIZES = ["5 Marla", "8 Marla", "10 Marla"]
+
 AGENTS = [
-    ("ayesha.tariq", "Ayesha", "Tariq", "Joiya Verified"),
-    ("bilal.sheikh", "Bilal", "Sheikh", "Meridian Estates"),
-    ("hina.qureshi", "Hina", "Qureshi", "Joiya Verified"),
-    ("usman.raza", "Usman", "Raza", "Crestline Realty"),
+    # username, first, last, brokerage, designation, phone, photo (Unsplash id)
+    ("ayesha.tariq", "Ayesha", "Tariq", "Joiya Verified", "Senior Sales Agent", "+92 300 1234567", "photo-1758518729466-827cd8293992"),
+    ("bilal.sheikh", "Bilal", "Sheikh", "Meridian Estates", "Property Consultant", "+92 301 2345678", "photo-1637589274742-8d4c152720a2"),
+    ("hina.qureshi", "Hina", "Qureshi", "Joiya Verified", "Team Lead", "+92 302 3456789", "photo-1611682060567-d7b07878d380"),
+    ("usman.raza", "Usman", "Raza", "Crestline Realty", "Senior Sales Agent", "+92 303 4567890", "photo-1621015600168-93f41e9c2810"),
 ]
+
+# The one featured Founder & Owner profile, shown above the regular agent
+# grid — separate from AGENTS above since it carries extra bio/experience
+# content that regular agent cards don't show. Placeholder copy, demo data.
+FOUNDER = {
+    "username": "asif.joiya",
+    "first_name": "Asif",
+    "last_name": "Joiya",
+    "brokerage": "Joiya Property Channel",
+    "designation": "Founder & Owner",
+    # Real contact numbers (comma-separated — FounderSection renders each as
+    # its own tel: link) and real email, not auto-generated placeholders.
+    "phone": "0333 3030124, 0306 7864121",
+    "email": "M.asifkhan3030143@gmail.com",
+    "photo": "photo-1787100612654-67781fcf62da",  # fallback stock photo
+    # Real uploaded photo's Cloudinary URL — takes priority over the stock
+    # "photo" fallback above when set.
+    "photo_url": "https://res.cloudinary.com/ddn36iad6/image/upload/v1791112650/joiya/seed/joiya-founder-asif-joiya.jpg",
+    "bio": (
+        "Asif Joiya has spent over a decade building Joiya Property Channel into one of "
+        "Lahore's most trusted names in real estate. Known for his hands-on approach and "
+        "deep knowledge of the city's housing schemes, he's guided hundreds of families to "
+        "a plot or home they could call their own."
+    ),
+    "experience_highlights": (
+        "Over 12 years of experience in Lahore real estate, specializing in plot sales, "
+        "housing scheme development, and client advisory.\n"
+        "Built and manages a verified network of agents across DHA, Bahria Town, and "
+        "Lahore's major housing societies."
+    ),
+}
 
 STREETS = [
     "Street 12", "Block D", "Sector C", "Mini Market", "Cavalry Ground",
     "Zaman Park", "Faisal Town", "Township Sector",
 ]
 
-# Real, freely-licensed Unsplash photos of houses, plots, and interiors —
-# used as cover_image_url / gallery images so seeded listings render actual
-# photography. Each pool has enough variety to give a property 4-6 distinct
-# photos without heavy repetition.
-PLOT_PHOTOS = [
-    "photo-1500382017468-9049fed747ef",
-    "photo-1500937386664-56d1dfef3854",
-    "photo-1501183638710-841dd1904471",
-    "photo-1444858291040-58f756a3bdd6",
-    "photo-1500534623283-312aade485b7",
-    "photo-1500382017468-9049fed747ef",
-    "photo-1464082354059-27db6ce50048",
-    "photo-1500375592092-40eb2168fd21",
-]
+# Plot photos: an aerial land photo with a red boundary line and corner pins
+# composited over it at seed-time — the marked-plot look used by Pakistani
+# real estate marketing (Zameen, Graana), which doesn't exist as stock
+# photography to hotlink. Each label maps to a base Unsplash photo + the
+# boundary box (as fractions of width/height) to draw on it; the composite
+# is generated once and uploaded to Cloudinary, never stored in this repo.
+PLOT_COMPOSITES = {
+    "plot-field-road-1": ("photo-1475082622110-f0e90ff503ff", (0.08, 0.40, 0.62, 0.92)),
+    "plot-field-road-2": ("photo-1475082622110-f0e90ff503ff", (0.40, 0.08, 0.95, 0.55)),
+    "plot-grid-lines-1": ("photo-1700503819014-60a36ddd10f8", (0.30, 0.10, 0.78, 0.90)),
+    "plot-bare-dirt-1": ("photo-1721137532032-4caaaf45c438", (0.42, 0.06, 0.98, 0.70)),
+    "plot-bare-dirt-2": ("photo-1721137532032-4caaaf45c438", (0.40, 0.30, 0.90, 0.95)),
+}
+PLOT_PHOTOS = list(PLOT_COMPOSITES.keys())
+# Real, freely-licensed Unsplash photos of modern concrete houses with
+# boundary walls/gates — closer to Lahore/Karachi residential architecture
+# than a Western suburban home.
 HOUSE_PHOTOS = [
-    "photo-1568605114967-8130f3a36994",
-    "photo-1613977257363-707ba9348227",
-    "photo-1600596542815-ffad4c1539a9",
-    "photo-1600607687939-ce8a6c25118c",
-    "photo-1600585154526-990dced4db0d",
-    "photo-1600047509807-ba8f99d2cdde",
-    "photo-1600566753086-00f18fb6b3ea",
-    "photo-1600210492493-0946911123ea",
+    "photo-1691749457417-74193b07ca1b",
+    "photo-1790212763348-dc86d1820b6a",
+    "photo-1613850011958-cfb3e7364058",
+    "photo-1790213680397-d86b221c762a",
+    "photo-1684691376857-5dfb87f6bc65",
+    "photo-1787672357650-36b6b7037db7",
 ]
 APARTMENT_PHOTOS = [
     "photo-1502672260266-1c1ef2d93688",
@@ -113,8 +166,46 @@ PHOTO_BY_TYPE = {
 }
 
 
-def unsplash_url(photo_id, width=1200, height=800):
+def _unsplash_url(photo_id, width=1200, height=800):
     return f"https://images.unsplash.com/{photo_id}?w={width}&h={height}&fit=crop&auto=format"
+
+
+# Every distinct photo is uploaded to Cloudinary at most once per seed run
+# (this cache), and Cloudinary itself no-ops repeat uploads of the same
+# public_id across runs (upload_remote/upload_marked_plot use
+# overwrite=False) — so re-running `seed` on every container start doesn't
+# re-upload anything.
+_resolved_photo_cache = {}
+
+
+def resolve_photo(entry):
+    if entry not in _resolved_photo_cache:
+        if entry in PLOT_COMPOSITES:
+            base_photo_id, box = PLOT_COMPOSITES[entry]
+            url = None
+            if cloudinary_images.is_configured():
+                try:
+                    url = cloudinary_images.upload_marked_plot(_unsplash_url(base_photo_id), box, public_id=entry)
+                except Exception as e:  # noqa: BLE001
+                    print(f"Cloudinary upload failed for {entry}, falling back to plain photo: {e}")
+            if url is None:
+                # No Cloudinary configured (or the upload failed) — fall back
+                # to the plain aerial photo (no red boundary marking, since
+                # that needs the compositing step to land somewhere hostable).
+                url = _unsplash_url(base_photo_id)
+        else:
+            url = None
+            if cloudinary_images.is_configured():
+                try:
+                    url = cloudinary_images.upload_remote(
+                        _unsplash_url(entry), public_id=entry.replace("photo-", "unsplash-")
+                    )
+                except Exception as e:  # noqa: BLE001
+                    print(f"Cloudinary upload failed for {entry}, falling back to direct hotlink: {e}")
+            if url is None:
+                url = _unsplash_url(entry)
+        _resolved_photo_cache[entry] = url
+    return _resolved_photo_cache[entry]
 
 
 class Command(BaseCommand):
@@ -129,33 +220,43 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        admin_user, admin_created = User.objects.get_or_create(
+        if not cloudinary_images.is_configured():
+            self.stdout.write(
+                self.style.WARNING(
+                    "CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET not set — "
+                    "falling back to hotlinked Unsplash photos (plots won't have the red "
+                    "boundary marking). Set these to host demo photos on Cloudinary instead."
+                )
+            )
+
+        admin_user, _ = User.objects.update_or_create(
             username="admin",
             defaults={
-                "email": "admin@joiya.test",
+                "email": "admin@joiyapropertychannel.com",
                 "is_staff": True,
                 "is_superuser": True,
                 "is_active": True,
             },
         )
-        if admin_created:
-            admin_user.set_password("admin12345")
-            admin_user.save(update_fields=["password"])
+        admin_user.set_password("AdminJPC")
+        admin_user.save(update_fields=["password"])
 
         neighborhoods = []
         neighborhood_centers = {}
-        for name, city, median, photo_id, lat, lng in NEIGHBORHOODS:
+        neighborhood_forced_types = {}
+        for name, city, median, photo_id, lat, lng, forced_type in NEIGHBORHOODS:
             obj, _ = Neighborhood.objects.get_or_create(
                 name=name,
                 city=city,
                 defaults={
                     "slug": name.lower().replace(" ", "-"),
                     "median_price_lac": median,
-                    "cover_image_url": unsplash_url(photo_id),
+                    "cover_image_url": resolve_photo(photo_id),
                 },
             )
             neighborhoods.append(obj)
             neighborhood_centers[obj.id] = (lat, lng)
+            neighborhood_forced_types[obj.id] = forced_type
 
         for name, school_type, grades, lat, lng, website in SCHOOLS:
             School.objects.get_or_create(
@@ -183,7 +284,7 @@ class Command(BaseCommand):
             )
 
         agents = []
-        for username, first, last, brokerage in AGENTS:
+        for username, first, last, brokerage, designation, phone, photo in AGENTS:
             user, _ = User.objects.get_or_create(
                 username=username,
                 defaults={
@@ -194,11 +295,42 @@ class Command(BaseCommand):
                     "is_active": True,
                 },
             )
-            agent, _ = Agent.objects.get_or_create(
+            agent, _ = Agent.objects.update_or_create(
                 user=user,
-                defaults={"brokerage": brokerage, "is_verified": True},
+                defaults={
+                    "brokerage": brokerage,
+                    "designation": designation,
+                    "phone": phone,
+                    "photo_url": resolve_photo(photo),
+                    "is_verified": True,
+                },
             )
             agents.append(agent)
+
+        founder_user, _ = User.objects.update_or_create(
+            username=FOUNDER["username"],
+            defaults={
+                "first_name": FOUNDER["first_name"],
+                "last_name": FOUNDER["last_name"],
+                "email": FOUNDER["email"],
+                "role": User.Role.AGENT,
+                "is_active": True,
+            },
+        )
+        founder_agent, _ = Agent.objects.update_or_create(
+            user=founder_user,
+            defaults={
+                "brokerage": FOUNDER["brokerage"],
+                "designation": FOUNDER["designation"],
+                "phone": FOUNDER["phone"],
+                "photo_url": FOUNDER["photo_url"] or resolve_photo(FOUNDER["photo"]),
+                "bio": FOUNDER["bio"],
+                "experience_highlights": FOUNDER["experience_highlights"],
+                "is_verified": True,
+                "is_founder": True,
+            },
+        )
+        agents.append(founder_agent)
 
         types = [c[0] for c in Property.PropertyType.choices]
         statuses = [c[0] for c in Property.ListingStatus.choices]
@@ -209,7 +341,8 @@ class Command(BaseCommand):
         for _i in range(count):
             neighborhood = random.choice(neighborhoods)
             agent = random.choice(agents)
-            prop_type = random.choices(types, weights=[45, 30, 15, 10], k=1)[0]
+            forced_type = neighborhood_forced_types[neighborhood.id]
+            prop_type = forced_type or random.choices(types, weights=[45, 30, 15, 10], k=1)[0]
             is_plot = prop_type == Property.PropertyType.PLOT
             price_lac = random.randint(60, 900)
             center_lat, center_lng = neighborhood_centers[neighborhood.id]
@@ -217,26 +350,36 @@ class Command(BaseCommand):
             # neighborhood don't all stack on one map point.
             jitter = lambda: random.uniform(-0.008, 0.008)  # noqa: E731
 
+            if neighborhood.name in PLOT_SCHEME_BLOCKS:
+                address = f"Plot {random.randint(10, 900)}, {PLOT_SCHEME_BLOCKS[neighborhood.name]}, {neighborhood.name}"
+                plot_size = random.choice(MARLA_SIZES)
+            elif neighborhood.name in HOUSE_SCHEME_BLOCKS:
+                address = f"House No. {random.randint(1, 500)}, {HOUSE_SCHEME_BLOCKS[neighborhood.name]}, {neighborhood.name}"
+                plot_size = random.choice(["5 Marla", "10 Marla", "1 Kanal"])
+            else:
+                address = f"{random.choice(STREETS)}, {neighborhood.name}"
+                plot_size = (
+                    random.choice(["5 Marla", "10 Marla", "1 Kanal", "2 Kanal"])
+                    if is_plot
+                    else random.choice(["Penthouse", "2 Kanal", "1 Kanal"])
+                )
+
             property_obj = Property.objects.create(
                 agent=agent,
                 neighborhood=neighborhood,
                 type=prop_type,
                 status=random.choice(statuses),
-                address=f"{random.choice(STREETS)}, {neighborhood.name}",
+                address=address,
                 price_lac=price_lac,
                 latitude=round(center_lat + jitter(), 6),
                 longitude=round(center_lng + jitter(), 6),
-                plot_size=(
-                    random.choice(["5 Marla", "10 Marla", "1 Kanal", "2 Kanal"])
-                    if is_plot
-                    else random.choice(["Penthouse", "2 Kanal", "1 Kanal"])
-                ),
+                plot_size=plot_size,
                 lot_size_sqft=random.randint(2500, 12000),
                 beds=None if is_plot else random.randint(2, 6),
                 baths=None if is_plot else random.randint(2, 5),
                 sqft=None if is_plot else random.randint(1200, 4500),
                 year_built=None if is_plot else random.randint(1985, 2024),
-                cover_image_url=unsplash_url(random.choice(PHOTO_BY_TYPE[prop_type])),
+                cover_image_url=resolve_photo(random.choice(PHOTO_BY_TYPE[prop_type])),
                 image_count=random.randint(8, 55),
             )
             # auto_now_add ignores assignment through .save(); update via queryset instead.
@@ -251,7 +394,7 @@ class Command(BaseCommand):
             )
             PropertyImage.objects.bulk_create(
                 [
-                    PropertyImage(property=property_obj, url=unsplash_url(photo_id), order=i)
+                    PropertyImage(property=property_obj, url=resolve_photo(photo_id), order=i)
                     for i, photo_id in enumerate(gallery)
                 ]
             )
@@ -294,12 +437,9 @@ class Command(BaseCommand):
                 f"{created} properties with photo galleries, price history, and tax history."
             )
         )
-        if admin_created:
-            self.stdout.write(
-                self.style.WARNING(
-                    "Admin user created — username: admin, password: admin12345 "
-                    "(change this before deploying anywhere real)."
-                )
+        self.stdout.write(
+            self.style.WARNING(
+                "Admin user ready — email: admin@joiyapropertychannel.com, password: AdminJPC "
+                "(change this before deploying anywhere real)."
             )
-        else:
-            self.stdout.write("Admin user already existed — left password unchanged.")
+        )

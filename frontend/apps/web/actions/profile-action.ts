@@ -1,10 +1,9 @@
 'use server'
 
 import { getApiClient } from '@/lib/api'
-import { authOptions } from '@/lib/auth'
+import { getSession } from '@/lib/auth'
 import type { profileFormSchema } from '@/lib/validation'
 import { ApiError, type UserCurrentError } from '@frontend/types/api'
-import { getServerSession } from 'next-auth'
 import type { z } from 'zod'
 
 export type ProfileFormSchema = z.infer<typeof profileFormSchema>
@@ -12,7 +11,7 @@ export type ProfileFormSchema = z.infer<typeof profileFormSchema>
 export async function profileAction(
   data: ProfileFormSchema
 ): Promise<boolean | UserCurrentError> {
-  const session = await getServerSession(authOptions)
+  const session = await getSession()
 
   try {
     const apiClient = await getApiClient(session)

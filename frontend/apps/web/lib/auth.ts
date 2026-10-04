@@ -1,105 +1,76 @@
-import { ApiError } from '@frontend/types/api'
-import type { AuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { getApiClient } from './api'
+import { betterAuth } from 'better-auth'
+import { nextCookies } from 'better-auth/next-js'
+import { headers } from 'next/headers'
+import { Pool } from 'pg'
 
-function decodeToken(token: string): {
-  token_type: string
-  exp: number
-  iat: number
-  jti: string
-  user_id: number
-} {
-  return JSON.parse(atob(token.split('.')[1]))
+async function bridgeDjangoRefreshToken(email: string, name: string): Promise<string> {
+  const [firstName, ...rest] = name.trim().split(' ')
+
+  const res = await fetch(`${process.env.API_URL}/api/auth/social/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      secret: process.env.INTERNAL_AUTH_SECRET,
+      email,
+      first_name: firstName ?? '',
+      last_name: rest.join(' ')
+    })
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to bridge Django session for ${email}: ${res.status}`)
+  }
+
+  const { refresh } = await res.json()
+  return refresh
 }
 
-const authOptions: AuthOptions = {
-  session: {
-    strategy: 'jwt'
+export const auth = betterAuth({
+  database: new Pool({
+    host: process.env.DATABASE_HOST || 'db',
+    port: 5432,
+    user: process.env.DATABASE_USER || 'postgres',
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME || 'db'
+  }),
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+  emailAndPassword: {
+    enabled: true
   },
-  pages: {
-    signIn: '/login'
-  },
-  callbacks: {
-    session: async ({ session, token }) => {
-      const access = decodeToken(token.access)
-      const refresh = decodeToken(token.refresh)
-
-      if (Date.now() / 1000 > access.exp && Date.now() / 1000 > refresh.exp) {
-        return Promise.reject({
-          error: new Error('Refresh token expired')
-        })
-      }
-
-      session.user = {
-        id: access.user_id,
-        username: token.username
-      }
-
-      session.refreshToken = token.refresh
-      session.accessToken = token.access
-
-      return session
-    },
-    jwt: async ({ token, user }) => {
-      if (user?.username) {
-        return { ...token, ...user }
-      }
-
-      // Refresh token
-      if (Date.now() / 1000 > decodeToken(token.access).exp) {
-        const apiClient = await getApiClient()
-        const res = await apiClient.token.tokenRefreshCreate({
-          access: token.access,
-          refresh: token.refresh
-        })
-
-        token.access = res.access
-      }
-
-      return { ...token, ...user }
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
     }
   },
-  providers: [
-    CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        username: {
-          label: 'Email',
-          type: 'text'
-        },
-        password: { label: 'Password', type: 'password' }
-      },
-      async authorize(credentials) {
-        if (credentials === undefined) {
-          return null
+  session: {
+    additionalFields: {
+      djangoRefresh: { type: 'string', required: false, input: false }
+    }
+  },
+  // Every sign-in (password or Google) creates a session here — Better Auth
+  // owns credentials/OAuth, but Django stays the source of truth for user
+  // data, so each new session is bridged into a Django JWT pair up front.
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session, ctx) => {
+          if (!ctx) return
+
+          const user = await ctx.context.internalAdapter.findUserById(session.userId)
+          if (!user?.email) return
+
+          const djangoRefresh = await bridgeDjangoRefreshToken(user.email, user.name ?? '')
+
+          return { data: { ...session, djangoRefresh } }
         }
-
-        try {
-          const apiClient = await getApiClient()
-          const res = await apiClient.token.tokenCreate({
-            username: credentials.username,
-            password: credentials.password,
-            access: '',
-            refresh: ''
-          })
-
-          return {
-            id: decodeToken(res.access).user_id,
-            username: credentials.username,
-            access: res.access,
-            refresh: res.refresh
-          }
-        } catch (error) {
-          if (error instanceof ApiError) {
-            return null
-          }
-        }
-
-        return null
       }
-    })
-  ]
-}
+    }
+  },
+  plugins: [nextCookies()]
+})
 
-export { authOptions }
+export async function getSession() {
+  return auth.api.getSession({ headers: await headers() })
+}
