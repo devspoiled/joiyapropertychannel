@@ -40,6 +40,7 @@ export default async function ListingsPage({
     PAGE_SIZE,
     price_max ? Number(price_max) : undefined,
     undefined,
+    undefined,
     type || undefined
   )
 

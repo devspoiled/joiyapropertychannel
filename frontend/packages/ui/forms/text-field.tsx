@@ -15,7 +15,7 @@ export function TextField({
   register,
   formState
 }: {
-  type: 'text' | 'password' | 'number'
+  type: 'text' | 'password' | 'number' | 'email'
   label: string
   placeholder?: string
   register: UseFormRegisterReturn

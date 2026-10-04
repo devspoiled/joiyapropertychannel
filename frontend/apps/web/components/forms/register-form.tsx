@@ -2,7 +2,7 @@
 
 import { GoogleIcon } from '@/components/auth/google-icon'
 import { authClient } from '@/lib/auth-client'
-import type { registerFormSchema } from '@/lib/validation'
+import { registerFormSchema } from '@/lib/validation'
 import { FormFooter } from '@frontend/ui/forms/form-footer'
 import { FormHeader } from '@frontend/ui/forms/form-header'
 import { SubmitField } from '@frontend/ui/forms/submit-field'
