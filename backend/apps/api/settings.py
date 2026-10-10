@@ -213,8 +213,8 @@ UNFOLD = {
     "SITE_FAVICONS": [
         {
             "rel": "icon",
-            "type": "image/png",
-            "href": lambda request: static("dashboard/logo.png"),
+            "type": "image/svg+xml",
+            "href": lambda request: static("dashboard/favicon.svg"),
         },
     ],
     "SHOW_HISTORY": True,

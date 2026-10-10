@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -7,6 +8,7 @@ from apps.api.dashboard import dashboard_view
 from apps.api.views import ContactView
 
 urlpatterns = [
+    path("", RedirectView.as_view(url="/admin/", permanent=False)),
     path("admin/dashboard/", dashboard_view, name="dashboard"),
     path(
         "api/schema/swagger-ui/",
