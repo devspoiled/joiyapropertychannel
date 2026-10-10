@@ -16,7 +16,9 @@ SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
 DEBUG = environ.get("DEBUG", "") == "1"
 
 ALLOWED_HOSTS = ["localhost", "api"] + [
-    host.strip() for host in environ.get("ALLOWED_HOSTS", "").split(",") if host.strip()
+    host.strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+    for host in environ.get("ALLOWED_HOSTS", "").split(",")
+    if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
