@@ -20,7 +20,7 @@ ALLOWED_HOSTS = ["localhost", "api"] + [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
+    origin.strip() if "://" in origin.strip() else f"https://{origin.strip()}"
     for origin in environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
