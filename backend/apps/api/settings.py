@@ -210,6 +210,13 @@ UNFOLD = {
         "light": lambda request: static("dashboard/logo.png"),
         "dark": lambda request: static("dashboard/logo-light.png"),
     },
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "type": "image/png",
+            "href": lambda request: static("dashboard/logo.png"),
+        },
+    ],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
