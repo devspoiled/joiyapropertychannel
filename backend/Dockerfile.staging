@@ -16,4 +16,4 @@ RUN uv sync --frozen --no-dev
 
 EXPOSE 8001
 
-CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py seed && gunicorn apps.api.wsgi:application --bind 0.0.0.0:8001"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py seed && gunicorn apps.api.wsgi:application --bind 0.0.0.0:8001"]
