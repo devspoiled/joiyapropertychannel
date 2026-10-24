@@ -1,18 +1,69 @@
 from unfold.admin import ModelAdmin, TabularInline
 
+from django import forms
 from django.contrib import admin
+
+from seeding import cloudinary_images
 
 from .models import Property, PropertyImage, SavedProperty
 
 
+class PropertyImageInlineForm(forms.ModelForm):
+    image_upload = forms.ImageField(required=False, label="Upload image")
+
+    class Meta:
+        model = PropertyImage
+        fields = ["url", "order", "image_upload"]
+        widgets = {"url": forms.HiddenInput()}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["url"].required = False
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("DELETE"):
+            return cleaned
+        upload = cleaned.get("image_upload")
+        if upload:
+            if not cloudinary_images.is_configured():
+                self.add_error("image_upload", "Cloudinary isn't configured on this server.")
+            else:
+                cleaned["url"] = cloudinary_images.upload_file(upload, folder="joiya/properties")
+        elif not cleaned.get("url"):
+            self.add_error("image_upload", "Upload an image.")
+        return cleaned
+
+
 class PropertyImageInline(TabularInline):
     model = PropertyImage
+    form = PropertyImageInlineForm
     extra = 1
-    fields = ["url", "order"]
+    fields = ["url", "image_upload", "order"]
+
+
+class PropertyAdminForm(forms.ModelForm):
+    cover_image_upload = forms.ImageField(required=False, label="Upload cover image")
+
+    class Meta:
+        model = Property
+        fields = "__all__"
+        widgets = {"cover_image_url": forms.HiddenInput()}
+
+    def clean(self):
+        cleaned = super().clean()
+        upload = cleaned.get("cover_image_upload")
+        if upload:
+            if not cloudinary_images.is_configured():
+                self.add_error("cover_image_upload", "Cloudinary isn't configured on this server.")
+            else:
+                cleaned["cover_image_url"] = cloudinary_images.upload_file(upload, folder="joiya/properties")
+        return cleaned
 
 
 @admin.register(Property)
 class PropertyAdmin(ModelAdmin):
+    form = PropertyAdminForm
     list_display = ["address", "type", "status", "price_lac", "neighborhood", "agent"]
     list_filter = ["type", "status", "neighborhood__city"]
     search_fields = ["address"]

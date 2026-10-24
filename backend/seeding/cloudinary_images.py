@@ -38,6 +38,15 @@ def upload_local(file_path: str, public_id: str, *, overwrite: bool = False) -> 
     return result["secure_url"]
 
 
+def upload_file(file_obj, folder: str) -> str:
+    """Upload a file the admin attached in a form (an UploadedFile — already
+    a readable stream, no temp file needed) and return its Cloudinary
+    secure_url. Used for the admin's "upload an image" fields instead of
+    asking staff to paste a URL."""
+    result = cloudinary.uploader.upload(file_obj, folder=folder)
+    return result["secure_url"]
+
+
 def upload_marked_plot(base_url: str, box: tuple[float, float, float, float], public_id: str) -> str:
     """Composite a red plot-boundary marking (the look used by Pakistani real
     estate marketing sites) onto an aerial land photo, entirely in memory,
