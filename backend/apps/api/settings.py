@@ -351,6 +351,11 @@ UNFOLD = {
                         "icon": "local_hospital",
                         "link": reverse_lazy("admin:hospitals_hospital_changelist"),
                     },
+                    {
+                        "title": _("Sell Requests"),
+                        "icon": "sell",
+                        "link": reverse_lazy("admin:sell_requests_sellrequest_changelist"),
+                    },
                 ],
             },
         ],
