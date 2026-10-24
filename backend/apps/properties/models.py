@@ -11,6 +11,7 @@ class Property(UUIDModel):
         HOUSE = "house", _("House")
         APARTMENT = "apartment", _("Apartment")
         VILLA = "villa", _("Villa")
+        FARM_HOUSE = "farm_house", _("Farm House")
 
     class ListingStatus(models.TextChoices):
         NEW = "new", _("New")

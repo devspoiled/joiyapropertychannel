@@ -37,7 +37,7 @@ export { StatusEnum } from './models/StatusEnum';
 export type { TaxHistory } from './models/TaxHistory';
 export type { TokenObtainPair } from './models/TokenObtainPair';
 export type { TokenRefresh } from './models/TokenRefresh';
-export { Type546Enum } from './models/Type546Enum';
+export { Type584Enum } from './models/Type584Enum';
 export type { UserChangePassword } from './models/UserChangePassword';
 export type { UserChangePasswordError } from './models/UserChangePasswordError';
 export type { UserCreate } from './models/UserCreate';

@@ -7,10 +7,12 @@
  * * `house` - House
  * * `apartment` - Apartment
  * * `villa` - Villa
+ * * `farm_house` - Farm House
  */
-export enum Type546Enum {
+export enum Type584Enum {
     PLOT = 'plot',
     HOUSE = 'house',
     APARTMENT = 'apartment',
     VILLA = 'villa',
+    FARM_HOUSE = 'farm_house',
 }

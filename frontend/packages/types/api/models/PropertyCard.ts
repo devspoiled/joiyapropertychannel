@@ -5,7 +5,7 @@
 import type { Agent } from './Agent';
 import type { Neighborhood } from './Neighborhood';
 import type { StatusEnum } from './StatusEnum';
-import type { Type546Enum } from './Type546Enum';
+import type { Type584Enum } from './Type584Enum';
 /**
  * Lean shape for list views — only what a property card renders.
  * Full nested images/tax_history/price_history are fetched separately
@@ -17,7 +17,7 @@ export type PropertyCard = {
     readonly id: string;
     readonly agent: Agent;
     readonly neighborhood: Neighborhood;
-    type: Type546Enum;
+    type: Type584Enum;
     status?: StatusEnum;
     address: string;
     price_lac: number;

@@ -3,11 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { StatusEnum } from './StatusEnum';
-import type { Type546Enum } from './Type546Enum';
+import type { Type584Enum } from './Type584Enum';
 export type PropertyWrite = {
     agent: string;
     neighborhood: string;
-    type: Type546Enum;
+    type: Type584Enum;
     status?: StatusEnum;
     address: string;
     price_lac: number;

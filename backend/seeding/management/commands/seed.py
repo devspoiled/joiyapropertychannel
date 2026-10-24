@@ -157,12 +157,24 @@ VILLA_PHOTOS = [
     "photo-1571055107559-3e67626fa8be",
     "photo-1613977257592-4871e5fcaf91",
 ]
+# Large houses set on open lawns/greenery — matches the "farm house" category
+# common on Lahore's Bedian/Raiwind Road listings (big house, big plot,
+# mostly grounds rather than dense urban construction).
+FARM_HOUSE_PHOTOS = [
+    "photo-1600585154340-be6161a56a0c",
+    "photo-1570129477492-45c003edd2be",
+    "photo-1600047509807-ba8f99d2cdde",
+    "photo-1600566752355-35792bedcfea",
+    "photo-1572120360610-d971b9d7767c",
+    "photo-1600047509358-9dc75507daeb",
+]
 
 PHOTO_BY_TYPE = {
     Property.PropertyType.PLOT: PLOT_PHOTOS,
     Property.PropertyType.HOUSE: HOUSE_PHOTOS,
     Property.PropertyType.APARTMENT: APARTMENT_PHOTOS,
     Property.PropertyType.VILLA: VILLA_PHOTOS,
+    Property.PropertyType.FARM_HOUSE: FARM_HOUSE_PHOTOS,
 }
 
 
@@ -342,7 +354,7 @@ class Command(BaseCommand):
             neighborhood = random.choice(neighborhoods)
             agent = random.choice(agents)
             forced_type = neighborhood_forced_types[neighborhood.id]
-            prop_type = forced_type or random.choices(types, weights=[45, 30, 15, 10], k=1)[0]
+            prop_type = forced_type or random.choices(types, weights=[42, 28, 15, 10, 5], k=1)[0]
             is_plot = prop_type == Property.PropertyType.PLOT
             price_lac = random.randint(60, 900)
             center_lat, center_lng = neighborhood_centers[neighborhood.id]

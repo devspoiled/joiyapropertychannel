@@ -8,12 +8,12 @@ import type { PriceHistory } from './PriceHistory';
 import type { PropertyImage } from './PropertyImage';
 import type { StatusEnum } from './StatusEnum';
 import type { TaxHistory } from './TaxHistory';
-import type { Type546Enum } from './Type546Enum';
+import type { Type584Enum } from './Type584Enum';
 export type Property = {
     readonly id: string;
     readonly agent: Agent;
     readonly neighborhood: Neighborhood;
-    type: Type546Enum;
+    type: Type584Enum;
     status?: StatusEnum;
     address: string;
     price_lac: number;
