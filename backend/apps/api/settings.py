@@ -1,6 +1,7 @@
 from os import environ
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -11,9 +12,20 @@ from django.utils.translation import gettext_lazy as _
 ######################################################################
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
-
 DEBUG = environ.get("DEBUG", "") == "1"
+
+
+def _require_env(name: str) -> str:
+    """In production, a missing secret must fail startup loudly rather than
+    silently fall back to a weak default — DEBUG-mode local dev is exempt
+    so the app still runs out of the box without a .env file."""
+    value = environ.get(name, "")
+    if not value and not DEBUG:
+        raise ImproperlyConfigured(f"{name} must be set when DEBUG is off.")
+    return value
+
+
+SECRET_KEY = _require_env("SECRET_KEY") or get_random_secret_key()
 
 ALLOWED_HOSTS = ["localhost", "api"] + [
     host.strip().removeprefix("https://").removeprefix("http://").rstrip("/")
@@ -31,6 +43,21 @@ CSRF_TRUSTED_ORIGINS = [
 # social login (e.g. Google) into a Django JWT — proves the call comes from
 # our own server, not a browser. See apps.users.views.SocialLoginView.
 INTERNAL_AUTH_SECRET = environ.get("INTERNAL_AUTH_SECRET", "")
+
+######################################################################
+# HTTPS / cookie security — off in DEBUG so local http dev is unaffected.
+# Traefik (Coolify's proxy) terminates TLS and forwards plain HTTP to this
+# container, so SECURE_PROXY_SSL_HEADER is required for Django to recognize
+# the original request as secure.
+######################################################################
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 ######################################################################
 # Cloudinary (image hosting for seeded/demo listing photos)
@@ -130,7 +157,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "USER": environ.get("DATABASE_USER", "postgres"),
-        "PASSWORD": environ.get("DATABASE_PASSWORD", "change-password"),
+        "PASSWORD": _require_env("DATABASE_PASSWORD") or "postgres",
         "NAME": environ.get("DATABASE_NAME", "db"),
         "HOST": environ.get("DATABASE_HOST", "db"),
         "PORT": "5432",
