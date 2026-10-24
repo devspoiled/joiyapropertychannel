@@ -8,7 +8,8 @@ from apps.api.dashboard import dashboard_view
 from apps.api.views import ContactView
 
 urlpatterns = [
-    path("", RedirectView.as_view(url="/admin/", permanent=False)),
+    path("", RedirectView.as_view(url="/admin/dashboard/", permanent=False)),
+    path("admin/", RedirectView.as_view(url="/admin/dashboard/", permanent=False)),
     path("admin/dashboard/", dashboard_view, name="dashboard"),
     path(
         "api/schema/swagger-ui/",
