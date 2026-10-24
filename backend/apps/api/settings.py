@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     "apps.price_history",
     "apps.schools",
     "apps.hospitals",
+    "apps.sell_requests",
     "seeding",
 ]
 

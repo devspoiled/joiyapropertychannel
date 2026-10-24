@@ -7,6 +7,7 @@
  * * `open_house` - Open house
  * * `price_drop` - Price drop
  * * `for_sale` - For sale
+ * * `for_rent` - For rent
  * * `sold` - Sold
  */
 export enum StatusEnum {
@@ -14,5 +15,6 @@ export enum StatusEnum {
     OPEN_HOUSE = 'open_house',
     PRICE_DROP = 'price_drop',
     FOR_SALE = 'for_sale',
+    FOR_RENT = 'for_rent',
     SOLD = 'sold',
 }

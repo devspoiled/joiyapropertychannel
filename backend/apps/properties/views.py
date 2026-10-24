@@ -20,6 +20,7 @@ class PropertyPagination(PageNumberPagination):
     list=extend_schema(
         parameters=[
             OpenApiParameter("type", str, description="Filter by property type"),
+            OpenApiParameter("status", str, description="Filter by listing status"),
             OpenApiParameter("city", str, description="Filter by neighborhood city"),
             OpenApiParameter("neighborhood", str, description="Filter by neighborhood slug"),
             OpenApiParameter("price_max", int, description="Max price in Lac"),
@@ -81,6 +82,10 @@ class PropertyViewSet(viewsets.ModelViewSet):
         type_ = params.get("type")
         if type_:
             queryset = queryset.filter(type=type_)
+
+        status_ = params.get("status")
+        if status_:
+            queryset = queryset.filter(status=status_)
 
         city = params.get("city")
         if city:

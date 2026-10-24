@@ -18,6 +18,7 @@ class Property(UUIDModel):
         OPEN_HOUSE = "open_house", _("Open house")
         PRICE_DROP = "price_drop", _("Price drop")
         FOR_SALE = "for_sale", _("For sale")
+        FOR_RENT = "for_rent", _("For rent")
         SOLD = "sold", _("Sold")
 
     agent = models.ForeignKey(

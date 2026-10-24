@@ -5,6 +5,7 @@ export const STATUS_LABELS: Record<StatusEnum, string> = {
   [StatusEnum.OPEN_HOUSE]: 'Open house',
   [StatusEnum.PRICE_DROP]: 'Price drop',
   [StatusEnum.FOR_SALE]: 'For sale',
+  [StatusEnum.FOR_RENT]: 'For rent',
   [StatusEnum.SOLD]: 'Sold'
 }
 
@@ -13,6 +14,7 @@ export const STATUS_COLORS: Record<StatusEnum, [string, string]> = {
   [StatusEnum.OPEN_HOUSE]: ['#1E241E', '#A8E6AE'],
   [StatusEnum.PRICE_DROP]: ['#F3EDDC', '#7A6320'],
   [StatusEnum.FOR_SALE]: ['#FFFFFF', '#3D473C'],
+  [StatusEnum.FOR_RENT]: ['#E6F0FA', '#1E4E7A'],
   [StatusEnum.SOLD]: ['#EDF1EA', '#6B756A']
 }
 

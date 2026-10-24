@@ -19,6 +19,7 @@ export class PropertiesService {
      * @param priceMax Max price in Lac
      * @param q Search by address, neighborhood or city
      * @param saved Only the current user's saved properties
+     * @param status Filter by listing status
      * @param type Filter by property type
      * @returns PaginatedPropertyCardList
      * @throws ApiError
@@ -32,6 +33,7 @@ export class PropertiesService {
         priceMax?: number,
         q?: string,
         saved?: boolean,
+        status?: string,
         type?: string,
     ): CancelablePromise<PaginatedPropertyCardList> {
         return this.httpRequest.request({
@@ -46,6 +48,7 @@ export class PropertiesService {
                 'price_max': priceMax,
                 'q': q,
                 'saved': saved,
+                'status': status,
                 'type': type,
             },
         });

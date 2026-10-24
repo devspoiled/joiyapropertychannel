@@ -7,18 +7,18 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 const NAV_LINKS = [
-  { label: 'Plots', href: '/#plots' },
-  { label: 'Homes', href: '/#buy' },
-  { label: 'Rent', href: '/#rent' },
-  { label: 'Sell', href: '/#sell' },
+  { label: 'Plots', href: '/listings?type=plot' },
+  { label: 'Homes', href: '/listings?type=house&status=for_sale' },
+  { label: 'Rent', href: '/listings?status=for_rent' },
+  { label: 'Sell', href: '/sell' },
   { label: 'Agents', href: '/agents' },
   { label: 'Explore', href: '/#explore' }
 ]
 
 const DRAWER_LINKS = [
-  { label: 'Buy', href: '/#buy', meta: '12,400' },
-  { label: 'Rent', href: '/#rent', meta: '3,180' },
-  { label: 'Sell your home', href: '/#sell', meta: '' },
+  { label: 'Buy', href: '/listings?status=for_sale', meta: '' },
+  { label: 'Rent', href: '/listings?status=for_rent', meta: '' },
+  { label: 'Sell your home', href: '/sell', meta: '' },
   { label: 'Agents', href: '/agents', meta: '' },
   { label: 'Saved homes', href: '/#saved', meta: '' }
 ]

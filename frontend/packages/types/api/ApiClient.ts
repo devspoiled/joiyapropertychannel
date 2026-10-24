@@ -14,6 +14,7 @@ import { PriceHistoryService } from './services/PriceHistoryService';
 import { PropertiesService } from './services/PropertiesService';
 import { SchemaService } from './services/SchemaService';
 import { SchoolsService } from './services/SchoolsService';
+import { SellRequestsService } from './services/SellRequestsService';
 import { TaxHistoryService } from './services/TaxHistoryService';
 import { TokenService } from './services/TokenService';
 import { UsersService } from './services/UsersService';
@@ -28,6 +29,7 @@ export class ApiClient {
     public readonly properties: PropertiesService;
     public readonly schema: SchemaService;
     public readonly schools: SchoolsService;
+    public readonly sellRequests: SellRequestsService;
     public readonly taxHistory: TaxHistoryService;
     public readonly token: TokenService;
     public readonly users: UsersService;
@@ -53,6 +55,7 @@ export class ApiClient {
         this.properties = new PropertiesService(this.request);
         this.schema = new SchemaService(this.request);
         this.schools = new SchoolsService(this.request);
+        this.sellRequests = new SellRequestsService(this.request);
         this.taxHistory = new TaxHistoryService(this.request);
         this.token = new TokenService(this.request);
         this.users = new UsersService(this.request);
