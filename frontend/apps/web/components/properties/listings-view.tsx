@@ -89,7 +89,7 @@ export function ListingsView({
       </div>
 
       <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 gap-5 px-4 pb-4 lg:px-6">
-        <div className="hidden w-[55%] shrink-0 overflow-hidden rounded-[18px] border border-[#E4EAE0] lg:block">
+        <div className="isolate hidden w-[55%] shrink-0 overflow-hidden rounded-[18px] border border-[#E4EAE0] lg:block">
           <ListingsMap
             properties={properties}
             hoveredId={hoveredId}
