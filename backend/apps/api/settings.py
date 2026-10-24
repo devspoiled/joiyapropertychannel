@@ -157,7 +157,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "USER": environ.get("DATABASE_USER", "postgres"),
-        "PASSWORD": _require_env("DATABASE_PASSWORD") or "postgres",
+        "PASSWORD": _require_env("DATABASE_PASSWORD") or "change-password",
         "NAME": environ.get("DATABASE_NAME", "db"),
         "HOST": environ.get("DATABASE_HOST", "db"),
         "PORT": "5432",

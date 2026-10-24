@@ -16,9 +16,6 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).exclude(role=User.Role.AGENT)
-
 
 @admin.register(Group)
 class GroupAdmin(BaseGroupAdmin, ModelAdmin):

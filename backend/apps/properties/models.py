@@ -21,13 +21,13 @@ class Property(UUIDModel):
 
     agent = models.ForeignKey(
         "agents.Agent",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="properties",
         verbose_name=_("agent"),
     )
     neighborhood = models.ForeignKey(
         "neighborhoods.Neighborhood",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="properties",
         verbose_name=_("neighborhood"),
     )
