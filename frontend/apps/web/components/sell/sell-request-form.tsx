@@ -1,7 +1,7 @@
 'use client'
 
 import { sellRequestAction } from '@/actions/sell-request-action'
-import { PropertyTypeEnum } from '@frontend/types/api'
+import { AreaUnitEnum, PropertyTypeEnum } from '@frontend/types/api'
 import { useState } from 'react'
 
 const PROPERTY_TYPE_OPTIONS = [
@@ -10,6 +10,12 @@ const PROPERTY_TYPE_OPTIONS = [
   { value: PropertyTypeEnum.VILLA, label: 'Villa' },
   { value: PropertyTypeEnum.FARM_HOUSE, label: 'Farm House' },
   { value: PropertyTypeEnum.PLOT, label: 'Plot' }
+]
+
+const AREA_UNIT_OPTIONS = [
+  { value: AreaUnitEnum.MARLA, label: 'Marla' },
+  { value: AreaUnitEnum.KANAL, label: 'Kanal' },
+  { value: AreaUnitEnum.SQFT, label: 'Square Feet' }
 ]
 
 const inputClass =
@@ -53,6 +59,8 @@ export function SellRequestForm() {
       email: String(form.get('email') || ''),
       phone: String(form.get('phone') || ''),
       property_type: form.get('property_type') as PropertyTypeEnum,
+      area_value: String(form.get('area_value') || ''),
+      area_unit: form.get('area_unit') as AreaUnitEnum,
       address: String(form.get('address') || ''),
       city: String(form.get('city') || ''),
       demanding_price_lac: Number(form.get('demanding_price_lac') || 0),
@@ -107,6 +115,25 @@ export function SellRequestForm() {
           ))}
         </select>
         <input name="city" type="text" required placeholder="City" className={inputClass} />
+      </div>
+
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <input
+          name="area_value"
+          type="number"
+          min={0}
+          step="0.01"
+          required
+          placeholder="Property area"
+          className={inputClass}
+        />
+        <select name="area_unit" required defaultValue={AreaUnitEnum.MARLA} className={inputClass}>
+          {AREA_UNIT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <input name="address" type="text" required placeholder="Full address" className={inputClass} />

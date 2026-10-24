@@ -38,6 +38,7 @@ def send_sell_request_email(sell_request) -> None:
     text = (
         f"Name: {r.name}\nEmail: {r.email}\nPhone: {r.phone}\n\n"
         f"Property type: {r.get_property_type_display()}\n"
+        f"Area: {r.area_value} {r.get_area_unit_display()}\n"
         f"Address: {r.address}\nCity: {r.city}\n"
         f"Demanding price: Rs {r.demanding_price_lac} Lac\n"
         f"Location: {r.latitude}, {r.longitude}\n"

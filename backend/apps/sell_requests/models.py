@@ -10,6 +10,11 @@ class SellRequest(models.Model):
         CONTACTED = "contacted", _("Contacted")
         CLOSED = "closed", _("Closed")
 
+    class AreaUnit(models.TextChoices):
+        MARLA = "marla", _("Marla")
+        KANAL = "kanal", _("Kanal")
+        SQFT = "sqft", _("Square Feet")
+
     # Submitter's contact details — not necessarily a registered user.
     name = models.CharField(_("name"), max_length=150)
     email = models.EmailField(_("email"))
@@ -17,6 +22,10 @@ class SellRequest(models.Model):
 
     property_type = models.CharField(
         _("property type"), max_length=20, choices=Property.PropertyType.choices
+    )
+    area_value = models.DecimalField(_("area"), max_digits=8, decimal_places=2)
+    area_unit = models.CharField(
+        _("area unit"), max_length=10, choices=AreaUnit.choices, default=AreaUnit.MARLA
     )
     address = models.CharField(_("address"), max_length=255)
     city = models.CharField(_("city"), max_length=120)

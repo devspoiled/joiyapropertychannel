@@ -11,6 +11,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { Agent } from './models/Agent';
+export { AreaUnitEnum } from './models/AreaUnitEnum';
 export type { Contact } from './models/Contact';
 export { EventEnum } from './models/EventEnum';
 export type { Hospital } from './models/Hospital';

@@ -39,10 +39,7 @@ export default function SellPage() {
       <section className="px-6 py-20 md:px-12">
         <div className="mx-auto max-w-[640px]">
           <div className="text-center">
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[.16em] text-[#4E9E5C]">
-              Sell with us
-            </div>
-            <h1 className="mt-2.5 font-sans text-[32px] font-extrabold tracking-[-.015em] text-[#1E241E] md:text-[40px]">
+            <h1 className="font-sans text-[32px] font-extrabold tracking-[-.015em] text-[#1E241E] md:text-[40px]">
               Tell us about your property
             </h1>
             <p className="mx-auto mt-3.5 max-w-[480px] text-[15px] leading-[1.65] text-[#6B756A]">

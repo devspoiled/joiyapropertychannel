@@ -11,6 +11,8 @@ class SellRequestSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "property_type",
+            "area_value",
+            "area_unit",
             "address",
             "city",
             "demanding_price_lac",
