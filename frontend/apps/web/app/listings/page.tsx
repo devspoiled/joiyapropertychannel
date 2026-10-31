@@ -3,6 +3,8 @@ import { getApiClient } from '@/lib/api'
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from 'next/font/google'
 import { twMerge } from 'tailwind-merge'
 
+export const dynamic = 'force-dynamic'
+
 const sans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
