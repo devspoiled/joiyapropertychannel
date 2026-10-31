@@ -2,11 +2,15 @@ from unfold.admin import ModelAdmin, TabularInline
 
 from django import forms
 from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import path
 
+from apps.hospitals.models import Hospital
+from apps.schools.models import School
 from seeding import cloudinary_images
 
 from .models import Property, PropertyFeature, PropertyImage, SavedProperty
-from .widgets import FeatureCheckboxDropdown
+from .widgets import CheckboxDropdown, FeatureCheckboxDropdown
 
 
 class PropertyImageInlineForm(forms.ModelForm):
@@ -52,6 +56,20 @@ class PropertyAdminForm(forms.ModelForm):
     features = forms.ModelMultipleChoiceField(
         queryset=PropertyFeature.objects.all(), required=False, widget=FeatureCheckboxDropdown
     )
+    # Same reasoning: declared explicitly so neither field gets Django's
+    # default related-field wrapping (which would add a "+ add another"
+    # icon) — schools/hospitals are only ever created from their own admin
+    # sections, never from within a property.
+    nearby_schools = forms.ModelMultipleChoiceField(
+        queryset=School.objects.all(),
+        required=False,
+        widget=CheckboxDropdown(lambda: School.objects.all(), "school", "schools"),
+    )
+    nearby_hospitals = forms.ModelMultipleChoiceField(
+        queryset=Hospital.objects.all(),
+        required=False,
+        widget=CheckboxDropdown(lambda: Hospital.objects.all(), "hospital", "hospitals"),
+    )
 
     class Meta:
         model = Property
@@ -74,6 +92,28 @@ class PropertyFeatureAdmin(ModelAdmin):
     list_display = ["name", "category"]
     list_filter = ["category"]
     search_fields = ["name"]
+
+    def get_urls(self):
+        return [
+            path(
+                "quick-add/",
+                self.admin_site.admin_view(self.quick_add_view),
+                name="properties_propertyfeature_quick_add",
+            ),
+        ] + super().get_urls()
+
+    def quick_add_view(self, request):
+        """Backs the inline "Add new" mini-form in the features dropdown on
+        the Property admin form — creates a PropertyFeature without leaving
+        the page, no popup window involved."""
+        if request.method != "POST":
+            return JsonResponse({"detail": "POST required."}, status=405)
+        name = request.POST.get("name", "").strip()
+        category = request.POST.get("category", "")
+        if not name or category not in PropertyFeature.Category.values:
+            return JsonResponse({"detail": "A name and valid category are required."}, status=400)
+        feature, _ = PropertyFeature.objects.get_or_create(name=name, category=category)
+        return JsonResponse({"id": feature.pk, "name": feature.name, "category": feature.category})
 
 
 @admin.register(Property)

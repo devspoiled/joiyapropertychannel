@@ -103,6 +103,16 @@ class Property(UUIDModel):
         PropertyFeature, blank=True, related_name="properties", verbose_name=_("features")
     )
 
+    # Explicitly curated by staff — shown in preference to the automatic
+    # distance-based "nearby" lookup when set (a property can have more
+    # than one of each).
+    nearby_schools = models.ManyToManyField(
+        "schools.School", blank=True, related_name="nearby_in_properties", verbose_name=_("nearby schools")
+    )
+    nearby_hospitals = models.ManyToManyField(
+        "hospitals.Hospital", blank=True, related_name="nearby_in_properties", verbose_name=_("nearby hospitals")
+    )
+
     description = models.TextField(_("description"), blank=True)
     cover_image_url = models.URLField(_("cover image URL"), blank=True)
     image_count = models.PositiveIntegerField(_("image count"), default=0)

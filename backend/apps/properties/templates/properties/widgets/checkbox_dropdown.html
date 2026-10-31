@@ -1,0 +1,42 @@
+{% load i18n %}
+<script>
+  if (typeof window.plainCheckboxDropdown === "undefined") {
+    window.plainCheckboxDropdown = function (options) {
+      return {
+        open: false,
+        options: options,
+        get selectedCount() {
+          return this.options.filter((o) => o.selected).length;
+        }
+      };
+    };
+  }
+</script>
+
+<script id="checkbox-dropdown-options-{{ widget.name }}" type="application/json">{{ widget.options_json|safe }}</script>
+
+<div
+  x-data="plainCheckboxDropdown(JSON.parse(document.getElementById('checkbox-dropdown-options-{{ widget.name }}').textContent))"
+  class="relative w-full max-w-2xl" @click.outside="open = false">
+  <button type="button" @click="open = !open"
+    class="flex h-9.5 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+    <span
+      x-text="selectedCount + ' ' + (selectedCount === 1 ? '{{ widget.noun_singular }}' : '{{ widget.noun_plural }}') + ' selected'"></span>
+    <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m5 7.5 5 5 5-5" />
+    </svg>
+  </button>
+
+  <div x-show="open" x-cloak
+    class="absolute z-30 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+    <div class="max-h-72 overflow-y-auto p-3">
+      <template x-for="option in options" :key="option.value">
+        <label class="flex items-center gap-2 py-1 text-sm text-gray-700 dark:text-gray-200">
+          <input type="checkbox" name="{{ widget.name }}" :value="option.value" x-model="option.selected"
+            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600">
+          <span x-text="option.label"></span>
+        </label>
+      </template>
+    </div>
+  </div>
+</div>

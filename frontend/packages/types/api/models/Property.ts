@@ -3,10 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Agent } from './Agent';
+import type { Hospital } from './Hospital';
 import type { Neighborhood } from './Neighborhood';
 import type { PriceHistory } from './PriceHistory';
 import type { PropertyFeature } from './PropertyFeature';
 import type { PropertyImage } from './PropertyImage';
+import type { School } from './School';
 import type { StatusEnum } from './StatusEnum';
 import type { TaxHistory } from './TaxHistory';
 import type { Type584Enum } from './Type584Enum';
@@ -27,6 +29,8 @@ export type Property = {
     sqft?: number | null;
     year_built?: number | null;
     readonly features: Array<PropertyFeature>;
+    readonly nearby_schools: Array<School>;
+    readonly nearby_hospitals: Array<Hospital>;
     description?: string;
     cover_image_url?: string;
     image_count?: number;

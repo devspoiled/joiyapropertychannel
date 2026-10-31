@@ -2,8 +2,12 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.agents.serializers import AgentSerializer
+from apps.hospitals.models import Hospital
+from apps.hospitals.serializers import HospitalSerializer
 from apps.neighborhoods.serializers import NeighborhoodSerializer
 from apps.price_history.serializers import PriceHistorySerializer
+from apps.schools.models import School
+from apps.schools.serializers import SchoolSerializer
 from apps.tax_history.serializers import TaxHistorySerializer
 
 from .models import Property, PropertyFeature, PropertyImage
@@ -69,6 +73,8 @@ class PropertySerializer(serializers.ModelSerializer):
     neighborhood = NeighborhoodSerializer(read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
     features = PropertyFeatureSerializer(many=True, read_only=True)
+    nearby_schools = SchoolSerializer(many=True, read_only=True)
+    nearby_hospitals = HospitalSerializer(many=True, read_only=True)
     tax_history = TaxHistorySerializer(many=True, read_only=True)
     price_history = PriceHistorySerializer(many=True, read_only=True)
     is_saved = serializers.SerializerMethodField()
@@ -92,6 +98,8 @@ class PropertySerializer(serializers.ModelSerializer):
             "sqft",
             "year_built",
             "features",
+            "nearby_schools",
+            "nearby_hospitals",
             "description",
             "cover_image_url",
             "image_count",
@@ -114,6 +122,12 @@ class PropertyWriteSerializer(serializers.ModelSerializer):
     features = serializers.PrimaryKeyRelatedField(
         many=True, required=False, queryset=PropertyFeature.objects.all()
     )
+    nearby_schools = serializers.PrimaryKeyRelatedField(
+        many=True, required=False, queryset=School.objects.all()
+    )
+    nearby_hospitals = serializers.PrimaryKeyRelatedField(
+        many=True, required=False, queryset=Hospital.objects.all()
+    )
 
     class Meta:
         model = Property
@@ -133,6 +147,8 @@ class PropertyWriteSerializer(serializers.ModelSerializer):
             "sqft",
             "year_built",
             "features",
+            "nearby_schools",
+            "nearby_hospitals",
             "description",
             "cover_image_url",
             "image_count",

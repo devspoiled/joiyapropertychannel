@@ -20,6 +20,8 @@ export type PatchedPropertyWrite = {
     sqft?: number | null;
     year_built?: number | null;
     features?: Array<number>;
+    nearby_schools?: Array<string>;
+    nearby_hospitals?: Array<string>;
     description?: string;
     cover_image_url?: string;
     image_count?: number;
