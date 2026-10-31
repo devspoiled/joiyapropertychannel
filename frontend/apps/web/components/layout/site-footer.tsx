@@ -49,6 +49,21 @@ const SOCIALS = [
         <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     )
+  },
+  {
+    label: 'TikTok',
+    href: 'https://tiktok.com',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+        <path
+          d="M14 4v9.8a2.8 2.8 0 1 1-2.2-2.73M14 4c.3 2 1.7 3.4 3.7 3.6"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    )
   }
 ]
 
