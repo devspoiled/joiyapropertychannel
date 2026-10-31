@@ -1,3 +1,4 @@
+import { WhatsAppButton } from '@/components/layout/whatsapp-button'
 import { AuthModalProvider } from '@/providers/auth-modal-provider'
 import type { Metadata } from 'next'
 
@@ -14,6 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <AuthModalProvider>{children}</AuthModalProvider>
+        <WhatsAppButton />
       </body>
     </html>
   )
