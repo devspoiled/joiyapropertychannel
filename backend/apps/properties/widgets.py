@@ -1,9 +1,33 @@
 import json
 
+from unfold.widgets import UnfoldAdminTextInputWidget
+
 from django import forms
 from django.urls import reverse
 
 from .models import PropertyFeature
+
+
+class AddressMapPickerWidget(UnfoldAdminTextInputWidget):
+    """The address input and a "Choose on map" button rendered together
+    inside one bordered box (button flush to the right, inside the input's
+    own border) — not Unfold's standard widget template, since the button
+    opens a modal: search a place name or click the map to drop a pin,
+    reverse-geocoded to an address — then fills address/latitude/longitude
+    back into the form. Uses the same free MapLibre + OpenStreetMap stack
+    as the public site's map (loaded from a CDN, only when the modal is
+    first opened), no API key needed."""
+
+    template_name = "properties/widgets/address_map_picker.html"
+
+
+class DynamicNumberInputWidget(UnfoldAdminTextInputWidget):
+    """Plain text input for property_number, whose on-screen label updates
+    to match whatever property type is selected (e.g. "Plot number",
+    "Villa number") by reading the live #id_type select — one DB column,
+    label just follows the type."""
+
+    template_name = "properties/widgets/dynamic_number_input.html"
 
 
 class FeatureCheckboxDropdown(forms.SelectMultiple):

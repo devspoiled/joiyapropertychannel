@@ -1,0 +1,18 @@
+{% include "django/forms/widgets/text.html" %}
+<script>
+  (function () {
+    function updatePropertyNumberLabel() {
+      var typeSelect = document.getElementById("id_type");
+      var label = document.querySelector('label[for="id_property_number"]');
+      if (!typeSelect || !label) return;
+      var selected = typeSelect.options[typeSelect.selectedIndex];
+      var typeName = selected ? selected.textContent.trim() : "";
+      label.textContent = typeName ? typeName + " number" : "Property number";
+    }
+    var typeSelect = document.getElementById("id_type");
+    if (typeSelect) {
+      typeSelect.addEventListener("change", updatePropertyNumberLabel);
+    }
+    updatePropertyNumberLabel();
+  })();
+</script>

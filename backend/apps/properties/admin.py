@@ -10,7 +10,7 @@ from apps.schools.models import School
 from seeding import cloudinary_images
 
 from .models import Property, PropertyFeature, PropertyImage, SavedProperty
-from .widgets import CheckboxDropdown, FeatureCheckboxDropdown
+from .widgets import AddressMapPickerWidget, CheckboxDropdown, DynamicNumberInputWidget, FeatureCheckboxDropdown
 
 
 class PropertyImageInlineForm(forms.ModelForm):
@@ -74,7 +74,11 @@ class PropertyAdminForm(forms.ModelForm):
     class Meta:
         model = Property
         fields = "__all__"
-        widgets = {"cover_image_url": forms.HiddenInput()}
+        widgets = {
+            "cover_image_url": forms.HiddenInput(),
+            "address": AddressMapPickerWidget,
+            "property_number": DynamicNumberInputWidget,
+        }
 
     def clean(self):
         cleaned = super().clean()

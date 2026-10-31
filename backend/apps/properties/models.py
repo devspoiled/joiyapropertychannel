@@ -78,6 +78,14 @@ class Property(UUIDModel):
         default=ListingStatus.FOR_SALE,
     )
 
+    # Pakistani housing societies are organized into named/lettered blocks
+    # (e.g. "C", "Chenab Block"), and a property is identified within one by
+    # a single number — e.g. "Plot 3, Block C" or "House 238, Block D".
+    # One column regardless of type; the admin UI just labels/shows it as
+    # "House number", "Plot number" etc. based on the selected `type`.
+    block = models.CharField(_("block"), max_length=60, blank=True)
+    property_number = models.CharField(_("property number"), max_length=30, blank=True)
+
     address = models.CharField(_("address"), max_length=255)
     price_lac = models.PositiveIntegerField(_("price (lac PKR)"))
     latitude = models.DecimalField(

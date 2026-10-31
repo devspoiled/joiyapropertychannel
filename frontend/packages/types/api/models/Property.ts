@@ -18,6 +18,8 @@ export type Property = {
     readonly neighborhood: Neighborhood;
     type: Type584Enum;
     status?: StatusEnum;
+    block?: string;
+    property_number?: string;
     address: string;
     price_lac: number;
     latitude?: string | null;
