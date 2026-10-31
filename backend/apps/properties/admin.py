@@ -1,5 +1,4 @@
 from unfold.admin import ModelAdmin, TabularInline
-from unfold.widgets import UnfoldAdminCheckboxSelectMultiple
 
 from django import forms
 from django.contrib import admin
@@ -7,6 +6,7 @@ from django.contrib import admin
 from seeding import cloudinary_images
 
 from .models import Property, PropertyFeature, PropertyImage, SavedProperty
+from .widgets import FeatureCheckboxDropdown
 
 
 class PropertyImageInlineForm(forms.ModelForm):
@@ -45,14 +45,18 @@ class PropertyImageInline(TabularInline):
 
 class PropertyAdminForm(forms.ModelForm):
     cover_image_upload = forms.ImageField(required=False, label="Upload cover image")
+    # Declared explicitly (not just via Meta.widgets) so the admin's default
+    # formfield_for_manytomany wrapping — the stray "+" icon that opens a
+    # raw add page instead of a popup, and doesn't work for a checkbox list
+    # anyway — never gets applied to this field.
+    features = forms.ModelMultipleChoiceField(
+        queryset=PropertyFeature.objects.all(), required=False, widget=FeatureCheckboxDropdown
+    )
 
     class Meta:
         model = Property
         fields = "__all__"
-        widgets = {
-            "cover_image_url": forms.HiddenInput(),
-            "features": UnfoldAdminCheckboxSelectMultiple,
-        }
+        widgets = {"cover_image_url": forms.HiddenInput()}
 
     def clean(self):
         cleaned = super().clean()
