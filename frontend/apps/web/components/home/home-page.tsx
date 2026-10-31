@@ -274,10 +274,47 @@ export function HomePage({
                 Questions about a listing, or want help finding the right plot or house? Send us a
                 message and we&apos;ll get back to you.
               </p>
-              <div className="mt-6 flex flex-col gap-2 text-[14.5px] text-[#3D473C]">
-                <a href="tel:03333030124" className="hover:text-[#1E241E]">0333 3030124</a>
-                <a href="tel:03067864121" className="hover:text-[#1E241E]">0306 7864121</a>
-                <a href="mailto:M.asifkhan3030143@gmail.com" className="hover:text-[#1E241E]">
+              <div className="mt-6 flex flex-col gap-3 text-[14.5px] text-[#3D473C]">
+                <a href="tel:03333030124" className="flex items-center gap-2.5 hover:text-[#1E241E]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EDF1EA] text-[#2F6B3A]">
+                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 3h2.8l1.2 3.4-1.7 1.3a9 9 0 0 0 4.5 4.5l1.3-1.7 3.4 1.2v2.8a1.5 1.5 0 0 1-1.6 1.5A13.5 13.5 0 0 1 3 4.6 1.5 1.5 0 0 1 4.5 3z"
+                      />
+                    </svg>
+                  </span>
+                  0333 3030124
+                </a>
+                <a
+                  href="https://wa.me/923067864121"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 hover:text-[#1E241E]"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EDF1EA] text-[#2F6B3A]">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.868-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                      <path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.48 1.34 4.997L2 22l5.114-1.341a9.96 9.96 0 0 0 4.89 1.248h.004c5.513 0 9.996-4.483 9.996-9.997 0-2.67-1.04-5.18-2.928-7.07a9.935 9.935 0 0 0-7.072-2.837zm0 18.187h-.003a8.2 8.2 0 0 1-4.178-1.144l-.3-.178-3.035.796.81-2.959-.195-.304a8.18 8.18 0 0 1-1.254-4.401c0-4.52 3.68-8.198 8.2-8.198a8.15 8.15 0 0 1 5.798 2.402 8.15 8.15 0 0 1 2.4 5.8c0 4.52-3.68 8.186-8.243 8.186z" />
+                    </svg>
+                  </span>
+                  0306 7864121
+                </a>
+                <a
+                  href="mailto:M.asifkhan3030143@gmail.com"
+                  className="flex items-center gap-2.5 hover:text-[#1E241E]"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EDF1EA] text-[#2F6B3A]">
+                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 5.5h14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z"
+                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m3 6 7 5 7-5" />
+                    </svg>
+                  </span>
                   M.asifkhan3030143@gmail.com
                 </a>
               </div>
