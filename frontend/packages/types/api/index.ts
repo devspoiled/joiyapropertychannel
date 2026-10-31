@@ -12,6 +12,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { Agent } from './models/Agent';
 export { AreaUnitEnum } from './models/AreaUnitEnum';
+export { CategoryEnum } from './models/CategoryEnum';
 export type { Contact } from './models/Contact';
 export { EventEnum } from './models/EventEnum';
 export type { Hospital } from './models/Hospital';
@@ -28,6 +29,7 @@ export type { PatchedUserCurrent } from './models/PatchedUserCurrent';
 export type { PriceHistory } from './models/PriceHistory';
 export type { Property } from './models/Property';
 export type { PropertyCard } from './models/PropertyCard';
+export type { PropertyFeature } from './models/PropertyFeature';
 export type { PropertyImage } from './models/PropertyImage';
 export { PropertyTypeEnum } from './models/PropertyTypeEnum';
 export type { PropertyWrite } from './models/PropertyWrite';

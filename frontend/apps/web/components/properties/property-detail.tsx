@@ -48,6 +48,36 @@ const HospitalIcon = () => (
   </svg>
 )
 
+const FEATURE_CATEGORY_ORDER = [
+  'interior',
+  'heating',
+  'cooling',
+  'appliances',
+  'parking',
+  'exterior',
+  'security',
+  'utilities',
+  'community'
+] as const
+
+const FEATURE_CATEGORY_LABELS: Record<string, string> = {
+  interior: 'Interior Features',
+  heating: 'Heating',
+  cooling: 'Cooling',
+  appliances: 'Appliances',
+  parking: 'Parking',
+  exterior: 'Exterior Features',
+  security: 'Security Features',
+  utilities: 'Utilities',
+  community: 'Community Features'
+}
+
+const CheckIcon = () => (
+  <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-[#2F6B3A]" fill="none" stroke="currentColor" strokeWidth="2.4">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m4 10 4 4 8-8" />
+  </svg>
+)
+
 const NAV_SECTIONS = [
   'Overview',
   'Facts & Features',
@@ -413,6 +443,30 @@ export function PropertyDetail({
                   </div>
                 ))}
               </dl>
+
+              {property.features.length > 0 && (
+                <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
+                  {FEATURE_CATEGORY_ORDER.map((category) => {
+                    const items = property.features.filter((f) => f.category === category)
+                    if (items.length === 0) return null
+                    return (
+                      <div key={category}>
+                        <h3 className="text-[13px] font-semibold uppercase tracking-[.06em] text-[#6B756A]">
+                          {FEATURE_CATEGORY_LABELS[category] ?? category}
+                        </h3>
+                        <ul className="mt-2.5 flex flex-col gap-2">
+                          {items.map((f) => (
+                            <li key={f.id} className="flex items-center gap-2 text-[14px] text-[#1E241E]">
+                              <CheckIcon />
+                              {f.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </section>
 
             {/* Tax History */}

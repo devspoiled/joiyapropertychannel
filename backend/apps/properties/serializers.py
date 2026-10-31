@@ -6,13 +6,19 @@ from apps.neighborhoods.serializers import NeighborhoodSerializer
 from apps.price_history.serializers import PriceHistorySerializer
 from apps.tax_history.serializers import TaxHistorySerializer
 
-from .models import Property, PropertyImage
+from .models import Property, PropertyFeature, PropertyImage
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
         fields = ["id", "url", "order"]
+
+
+class PropertyFeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyFeature
+        fields = ["id", "name", "category"]
 
 
 class PropertyCardSerializer(serializers.ModelSerializer):
@@ -62,6 +68,7 @@ class PropertySerializer(serializers.ModelSerializer):
     agent = AgentSerializer(read_only=True)
     neighborhood = NeighborhoodSerializer(read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
+    features = PropertyFeatureSerializer(many=True, read_only=True)
     tax_history = TaxHistorySerializer(many=True, read_only=True)
     price_history = PriceHistorySerializer(many=True, read_only=True)
     is_saved = serializers.SerializerMethodField()
@@ -84,6 +91,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "baths",
             "sqft",
             "year_built",
+            "features",
             "description",
             "cover_image_url",
             "image_count",
@@ -103,6 +111,10 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyWriteSerializer(serializers.ModelSerializer):
+    features = serializers.PrimaryKeyRelatedField(
+        many=True, required=False, queryset=PropertyFeature.objects.all()
+    )
+
     class Meta:
         model = Property
         fields = [
@@ -120,6 +132,7 @@ class PropertyWriteSerializer(serializers.ModelSerializer):
             "baths",
             "sqft",
             "year_built",
+            "features",
             "description",
             "cover_image_url",
             "image_count",

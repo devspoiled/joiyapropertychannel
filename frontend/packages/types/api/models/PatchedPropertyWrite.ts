@@ -19,6 +19,7 @@ export type PatchedPropertyWrite = {
     baths?: number | null;
     sqft?: number | null;
     year_built?: number | null;
+    features?: Array<number>;
     description?: string;
     cover_image_url?: string;
     image_count?: number;

@@ -5,6 +5,7 @@
 import type { Agent } from './Agent';
 import type { Neighborhood } from './Neighborhood';
 import type { PriceHistory } from './PriceHistory';
+import type { PropertyFeature } from './PropertyFeature';
 import type { PropertyImage } from './PropertyImage';
 import type { StatusEnum } from './StatusEnum';
 import type { TaxHistory } from './TaxHistory';
@@ -25,6 +26,7 @@ export type Property = {
     baths?: number | null;
     sqft?: number | null;
     year_built?: number | null;
+    readonly features: Array<PropertyFeature>;
     description?: string;
     cover_image_url?: string;
     image_count?: number;

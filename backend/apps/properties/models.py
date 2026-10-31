@@ -5,6 +5,40 @@ from django.utils.translation import gettext_lazy as _
 from apps.api.models import UUIDModel
 
 
+class PropertyFeature(models.Model):
+    """A fixed taxonomy of selectable amenities/features (heating, cooling,
+    parking, etc.) — grouped by category, same idea as Zillow's "Facts and
+    features" section. The actual rows are seeded by a migration (so they
+    exist in prod too, which never runs the demo `seed` command), not
+    created ad hoc by staff."""
+
+    class Category(models.TextChoices):
+        INTERIOR = "interior", _("Interior Features")
+        HEATING = "heating", _("Heating")
+        COOLING = "cooling", _("Cooling")
+        APPLIANCES = "appliances", _("Appliances")
+        PARKING = "parking", _("Parking")
+        EXTERIOR = "exterior", _("Exterior Features")
+        SECURITY = "security", _("Security Features")
+        UTILITIES = "utilities", _("Utilities")
+        COMMUNITY = "community", _("Community Features")
+
+    name = models.CharField(_("name"), max_length=100)
+    category = models.CharField(_("category"), max_length=20, choices=Category.choices)
+
+    class Meta:
+        db_table = "property_features"
+        verbose_name = _("property feature")
+        verbose_name_plural = _("property features")
+        ordering = ["category", "name"]
+        constraints = [
+            models.UniqueConstraint(fields=["name", "category"], name="unique_feature_per_category")
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Property(UUIDModel):
     class PropertyType(models.TextChoices):
         PLOT = "plot", _("Plot")
@@ -64,6 +98,10 @@ class Property(UUIDModel):
     baths = models.PositiveSmallIntegerField(_("baths"), null=True, blank=True)
     sqft = models.PositiveIntegerField(_("covered area (sq ft)"), null=True, blank=True)
     year_built = models.PositiveSmallIntegerField(_("year built"), null=True, blank=True)
+
+    features = models.ManyToManyField(
+        PropertyFeature, blank=True, related_name="properties", verbose_name=_("features")
+    )
 
     description = models.TextField(_("description"), blank=True)
     cover_image_url = models.URLField(_("cover image URL"), blank=True)

@@ -1,11 +1,12 @@
 from unfold.admin import ModelAdmin, TabularInline
+from unfold.widgets import UnfoldAdminCheckboxSelectMultiple
 
 from django import forms
 from django.contrib import admin
 
 from seeding import cloudinary_images
 
-from .models import Property, PropertyImage, SavedProperty
+from .models import Property, PropertyFeature, PropertyImage, SavedProperty
 
 
 class PropertyImageInlineForm(forms.ModelForm):
@@ -48,7 +49,10 @@ class PropertyAdminForm(forms.ModelForm):
     class Meta:
         model = Property
         fields = "__all__"
-        widgets = {"cover_image_url": forms.HiddenInput()}
+        widgets = {
+            "cover_image_url": forms.HiddenInput(),
+            "features": UnfoldAdminCheckboxSelectMultiple,
+        }
 
     def clean(self):
         cleaned = super().clean()
@@ -59,6 +63,13 @@ class PropertyAdminForm(forms.ModelForm):
             else:
                 cleaned["cover_image_url"] = cloudinary_images.upload_file(upload, folder="joiya/properties")
         return cleaned
+
+
+@admin.register(PropertyFeature)
+class PropertyFeatureAdmin(ModelAdmin):
+    list_display = ["name", "category"]
+    list_filter = ["category"]
+    search_fields = ["name"]
 
 
 @admin.register(Property)

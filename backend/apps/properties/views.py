@@ -60,7 +60,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
         # views only need images (for the card's hover carousel), so skip
         # the heavier prefetches there.
         if self.action == "retrieve":
-            queryset = queryset.prefetch_related("images", "tax_history", "price_history")
+            queryset = queryset.prefetch_related("images", "features", "tax_history", "price_history")
         elif self.action == "list":
             queryset = queryset.prefetch_related("images")
 
