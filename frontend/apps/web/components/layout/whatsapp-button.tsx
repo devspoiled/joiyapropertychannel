@@ -6,7 +6,8 @@ export function WhatsAppButton() {
       href={`https://wa.me/${WHATSAPP_NUMBER}`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat with us on WhatsApp"
+      title="Contact Mr Asif Joiya"
+      aria-label="Contact Mr Asif Joiya on WhatsApp"
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-[0_10px_28px_-8px_rgba(0,0,0,.45)] transition-transform hover:scale-105"
     >
       <svg viewBox="0 0 24 24" className="h-7 w-7" fill="white">
